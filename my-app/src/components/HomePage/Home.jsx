@@ -28,7 +28,7 @@ const Home = () => {
           </TopBar>
           <Editor>
             <Code>
-            {`import React from 'react';\n \n function hackTheWorld() {\n              console.log("Welcome to the Matrix");\nreturn "You're in!";\n}\n\nhackTheWorld();`}
+            {`import HackTools from 'CyberArch';\n \n function hackTheWorld() {\n              console.log("Welcome to the Matrix");\nreturn "You're in!";\n}\n\nhackTheWorld();`}
             </Code>
           </Editor>
         </VSCodeContainer>
