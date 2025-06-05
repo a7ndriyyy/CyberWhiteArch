@@ -1,0 +1,61 @@
+
+.globalcontainer{
+width: 1506px;
+height: 2427px;
+flex-shrink: 0;
+border: 1px solid #000;
+opacity: 0.9;
+box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+
+
+.contaner{
+     display: flex;
+flex-direction: column;
+align-items: center;
+gap: 120px;
+align-self: stretch;
+}
+
+.homecontainer{
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 42px;
+}
+
+
+
+
+.logoimage{
+width: 392px;
+height: 316px;
+};
+.hometitle{
+    text-align: center;
+font-feature-settings: 'ss02' on, 'ss03' on, 'ss04' on, 'liga' off;
+text-shadow: 0px 2px 5px #17181C;
+font-family: "Space Grotesk";
+font-size: 87px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+letter-spacing: -0.87px;
+
+background: linear-gradient(180deg, #F5F5F5 0%, #B4B4B4 71%);
+background-clip: text;
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+};
+.hometext{
+    width: 1506px;
+height: 2427px;
+flex-shrink: 0;
+
+    border-radius: 60px;
+border: 1px solid #000;
+opacity: 0.9;
+background: #303741;
+box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+};
