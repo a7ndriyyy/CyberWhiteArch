@@ -1,0 +1,287 @@
+.container-whatweare{
+align-items: center;
+justify-content:center ;
+margin-left: 150px;
+margin-right: 150px;
+}
+
+.whatwearecontainer{
+    display: flex;
+    margin-top: 42px;
+align-items: flex-end;
+gap: 10px;
+justify-content: center;
+}
+.what-title {
+color: #9AA1AC;
+text-align: center;
+font-feature-settings: 'ss02' on, 'ss03' on, 'ss04' on, 'liga' off;
+font-family: "Space Grotesk";
+font-size: 42px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+letter-spacing: -0.84px;
+}
+.what-text {
+ color: #707989;
+text-align: center;
+
+font-feature-settings: 'ss02' on, 'ss03' on, 'ss04' on, 'liga' off;
+
+/* button-text */
+font-family: "Space Grotesk";
+font-size: 24px;
+font-style: normal;
+font-weight: 420;
+line-height: normal;
+
+margin-bottom: 40px;
+}
+
+
+
+
+
+
+/* Grid Section */
+
+.grid-section {
+  padding: 60px 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.grid-item {
+  background: #1f2937; /* card color */
+  color: #e5e7eb; /* light text */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.grid-item:hover {
+  transform: translateY(-4px);
+}
+
+.item-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.item-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #d1d5db;
+}
+
+/* Optional: unique styles for specific blocks */
+.grid-item.news {
+background: rgba(41, 43, 51, 0.70);
+  color: white;
+  width: 350px;
+height: 360px;
+}
+
+.share{
+width: 360px;
+height: 172px;
+}
+
+.good{
+    margin-top: -180px;
+    height: 172px;
+}
+
+.privacy{
+   margin-top: -110px;
+    height: 172px;
+}
+
+
+
+.title-news {
+ text-align: center;
+font-feature-settings: 'liga' off;
+text-shadow: 0px 2px 5px #17181C;
+font-family: Video;
+font-size: 100px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+letter-spacing: -1.11px;
+
+background: linear-gradient(180deg, #7D7D7D 0%, #4F5259 58%);
+background-clip: text;
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+
+margin-top: 0%;
+margin-bottom: 10px;
+}
+
+.under-title{
+    display: inline-flex;
+padding: 8.897px 17.793px;
+justify-content: center;
+align-items: center;
+gap: 14.828px;
+background: #042962;
+box-shadow: 0px 2.966px 7.414px 0px rgba(23, 24, 28, 0.60);
+
+margin-top: auto;
+margin-right: auto;
+
+
+color: #0957D0;
+text-align: center;
+font-feature-settings: 'ss02' on, 'ss03' on, 'ss04' on, 'liga' off;
+font-family: "Space Grotesk";
+font-size: 35.586px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+letter-spacing: 1.423px;
+}
+
+
+.what-logo{
+    margin-top: 0%;
+}
+
+
+.tor{
+    transform: rotate(-10.694deg);
+
+font-feature-settings: 'liga' off;
+text-shadow: 0px 1.595px 3.986px #17181C;
+font-family: Rubik;
+font-size: 88.496px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+letter-spacing: -0.885px;
+
+background: linear-gradient(180deg, #7D7D7D 0%, #4F5259 58%);
+background-clip: text;
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+
+flex-shrink: 0;
+
+margin-left: 0%;
+}
+.bcrypt{
+
+transform: rotate(15deg);
+text-align: right;
+font-feature-settings: 'liga' off;
+text-shadow: 0px 0.738px 1.844px #17181C;
+font-family: "Space Grotesk";
+font-size: 40.946px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+letter-spacing: -0.409px;
+
+background: linear-gradient(180deg, #7D7D7D 0%, #4F5259 58%);
+background-clip: text;
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+
+
+}
+.osint{
+
+    transform: rotate(2.039deg);
+
+    text-align: center;
+font-feature-settings: 'liga' off;
+text-shadow: 0px 0.868px 2.17px #17181C;
+font-family: "Space Grotesk";
+font-size: 48.177px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+letter-spacing: -0.482px;
+
+background: linear-gradient(180deg, #7D7D7D 0%, #4F5259 58%);
+background-clip: text;
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+
+flex-shrink: 0;
+}
+
+.word-cloud {
+  position: relative;
+  height: 120px;
+  margin-bottom: 20px;
+}
+
+.word {
+  position: absolute;
+  font-weight: bold;
+  opacity: 0.7;
+  font-family: monospace;
+  color: #60a5fa; /* голубуватий */
+  pointer-events: none;
+}
+
+/* Індивідуальні позиції */
+.word.tor {
+  top: 10px;
+  left: 20px;
+  font-size: 28px;
+}
+
+.word.bcrypt {
+  top: 40px;
+  left: 100px;
+  font-size: 20px;
+  color: #3b82f6;
+}
+
+.word.osint {
+  top: 70px;
+  left: 60px;
+  font-size: 24px;
+}
+
+.word.privacy {
+  top: 20px;
+  left: 200px;
+  font-size: 18px;
+  color: #93c5fd;
+}
+
+.word.passwords {
+  top: 0;
+  left: 150px;
+  font-size: 16px;
+  color: #a5b4fc;
+}
+
+.word.gathering {
+  top: 90px;
+  left: 180px;
+  font-size: 14px;
+  color: #38bdf8;
+}
+
+
+
+
+.grid-item.empty {
+  background: transparent;
+  box-shadow: none;
+}
+

@@ -23,6 +23,8 @@ gap: 42px;
 margin-left: auto;
 margin-right: auto;
 margin-top: 100px;
+
+   width: 670.25px;
 }
 
 
@@ -33,11 +35,16 @@ width: 392px;
 height: 316px;
 };
 
+.homecircle{
+    width: 670.25px;
+}
+
+
 
 .hometitle{
 text-align: center;
 font-feature-settings: 'ss02' on, 'ss03' on, 'ss04' on, 'liga' off;
-text-shadow: 0px 2px 5px #17181C;
+text-shadow: 0px 2px 5px #767881;
 font-family: "Space Grotesk";
 font-size: 87px;
 font-style: normal;
@@ -50,7 +57,7 @@ background-clip: text;
 -webkit-background-clip: text;
 -webkit-text-fill-color: transparent;
 
-};
+}
 
 .hometext{
 color: #707989;
@@ -64,12 +71,13 @@ font-size: 24px;
 font-style: normal;
 font-weight: 420;
 line-height: normal;
-};
+
+}
 
 
-.home-button{
-    width: 670.25px;
-height: 68px;
+ .home-button{
+      width: 670.25px;
+      height: 68px;
 flex-shrink: 0;
 fill: #303741;
 }
