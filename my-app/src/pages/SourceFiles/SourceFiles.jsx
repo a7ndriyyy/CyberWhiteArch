@@ -1,10 +1,11 @@
 import React from 'react';
+import FileManager from '../../components/SourceFilePage/FileManager';
 
 const SourceFiles = () => {
   return (
     <main >
       <section >
-        <h1>Welcome to The Source Files</h1>
+        <FileManager/>
       </section>
     </main>
   );

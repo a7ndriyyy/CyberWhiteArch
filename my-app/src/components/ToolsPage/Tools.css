@@ -1,0 +1,79 @@
+.tools-container {
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tool-card {
+  background: #2a2a40;
+  border: 1px solid #383854;
+  border-radius: 12px;
+  padding: 20px;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tool-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.tool-info h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #21a1f1;
+}
+
+.tool-info p {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: #ccccdd;
+}
+
+.tool-icon img {
+  width: 48px;
+  height: 48px;
+}
+
+
+.tool-name {
+  font-size: 22px;
+  font-weight: bold;
+  color: #21a1f1;
+  margin-bottom: 10px;
+}
+
+.tool-description {
+  font-size: 15px;
+  color: #dddddd;
+  line-height: 1.4;
+}
+
+
+
+
+
+.tool-search {
+  width: 100%;
+  max-width: 400px;
+  margin: 40px auto 20px;
+  display: block;
+  padding: 12px 18px;
+  background-color: #1f1f2e;
+  color: #ffffff;
+  border: 1px solid #444;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.tool-search:focus {
+  outline: none;
+  border-color: #21a1f1;
+  box-shadow: 0 0 5px #21a1f1;
+}

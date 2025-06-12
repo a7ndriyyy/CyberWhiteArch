@@ -1,10 +1,11 @@
 import React from 'react';
+import ToolsPage from '../../components/ToolsPage/ToolsPage';
 
 const Tools = () => {
   return (
     <main >
       <section >
-        <h1>Welcome to The Tools</h1>
+        <ToolsPage/>
       </section>
     </main>
   );

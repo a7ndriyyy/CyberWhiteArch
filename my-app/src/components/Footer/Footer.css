@@ -31,6 +31,7 @@
 }
 
 
+
 .footer-contact,
 .footer-links,
 .footer-social {
@@ -51,6 +52,14 @@
   display: block;
 }
 
+.footer-logo :hover , 
+.footer-bottom :hover, 
+.footer-contact :hover , 
+.footer-links :hover , 
+.footer-social :hover {
+  animation: glitch 0.2s infinite;
+}
+
 .footer-links a:hover,
 .footer-social a:hover {
   color: white;
@@ -67,4 +76,15 @@
 .footer-links , 
 .footer-social {
  margin-top: 20px ; 
+}
+
+
+
+
+@keyframes glitch {
+  0% { text-shadow: 2px 2px #21a1f1, -2px -2px #21a1f1; }
+  25% { text-shadow: -2px -2px #21a1f1, 2px 2px #21a1f1; }
+  50% { text-shadow: 2px -2px #21a1f1, -2px 2px #21a1f1; }
+  75% { text-shadow: -2px 2px #21a1f1, 2px -2px #21a1f1; }
+  100% { text-shadow: 2px 2px #21a1f1, -2px -2px #21a1f1; }
 }
