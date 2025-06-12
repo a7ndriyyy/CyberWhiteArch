@@ -2,6 +2,7 @@
 import React from 'react';
 import ToolCard from './ToolsCard';
 import './Tools.css'; // Import the CSS file for styling
+import ScrollToTop from '../Scroll/ScrollTop'; // Import the ScrollToTop component
 
 import { useState } from 'react';
 
@@ -518,6 +519,7 @@ const ToolsPage = () => {
           />
         ))}
       </div>
+      <ScrollToTop />
     </div>
   );
 };
