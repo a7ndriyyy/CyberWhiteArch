@@ -6,12 +6,16 @@ import Tools from './pages/Tools/Tools';
 import SourceFiles from './pages/SourceFiles/SourceFiles';
 import Community from './pages/Community/Community';
 import Footer from './components/Footer/Footer'; 
+import Login from './components/Login/Login';
+import Register from './components/Register/Register';
 
 function App() {
   return (
     <Router>
       <Header />
       <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/" element={<Home />} />
         <Route path="/tools" element={<Tools/>} />
         <Route path="/source-files" element={<SourceFiles/>} />

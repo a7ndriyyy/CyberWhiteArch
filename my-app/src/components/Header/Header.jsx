@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, NavLink  } from 'react-router-dom';
 import './Header.css';
+import Login from '../Login/Login';
 
 const Header = () => {
   return (
@@ -25,9 +26,9 @@ const Header = () => {
         </NavLink>
         <NavLink className="nav-link" to="/community">Community</NavLink>
       </nav>
-
+          <Link to="/login" className="login-link">
       <button className="button">GET STARTED</button>
-      
+      </Link>
     </header>
     </div>
   );
