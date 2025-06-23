@@ -5,7 +5,14 @@
   align-items: center;
   color: white;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: #242424;
+  /* background-color: #242424; */
+}
+
+.background-global-header{
+background-image: url('../../assets/tilesBackForsite.png');
+background-size: cover;
+background-position: center;
+
 }
 
 .global-header{

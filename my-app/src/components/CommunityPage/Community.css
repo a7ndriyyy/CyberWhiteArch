@@ -1,0 +1,87 @@
+.community-section {
+  display: flex;
+  background-color: #1e1e1e;
+  padding: 40px;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.left-image img {
+  object-fit: cover;
+}
+
+.right-content {
+  max-width: 600px;
+  text-align: center;
+}
+
+.right-content h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.right-content p {
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.join-btn {
+  background-color: #2f46ff;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.community-box {
+  border: 2px solid #2670f1;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #2a2a2a;
+  gap: 20px;
+}
+
+.box-column {
+  background-color: #3a3a3a;
+  padding: 16px;
+  border-radius: 10px;
+  flex: 1;
+}
+
+.box-column h3 {
+  background-color: #555;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.group, .channel {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 10px;
+}
+
+.group img, .channel img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.group button {
+  margin-left: auto;
+  background-color: #2f46ff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}

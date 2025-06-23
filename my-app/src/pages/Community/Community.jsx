@@ -1,10 +1,13 @@
 import React from 'react';
+import CommunityPage from '../../components/CommunityPage/CommunityPage';
+import ChatCard from '../../components/CommunityPage/sectionCommunity/chatSection';
 
 const Community = () => {
   return (
     <main >
       <section >
-        <h1>Welcome to The Community</h1>
+        <CommunityPage />
+        <ChatCard/>
       </section>
     </main>
   );

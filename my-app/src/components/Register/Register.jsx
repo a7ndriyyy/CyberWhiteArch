@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import '../Register/Register.css';
-import logo from '../../assets/bunnylogo.png';
+import logo from '../../assets/bunnylogo.png'; // Adjust the path as necessary
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   const [step, setStep] = useState(1);
   const [username, setUsername] = useState('');
   const [generatedPassword, setGeneratedPassword] = useState('');
+   const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
 
   const generatePassword = () => {
@@ -36,6 +37,33 @@ export default function Register() {
 
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedPassword);
+     setCopied(true);
+     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const registerUser = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          username: username, 
+          password: generatedPassword
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('User registered successfully!');
+        navigate('/login');
+      } else {
+        alert('Error: ' + data.msg);
+      }
+    } catch (error) {
+       console.error('Registration error:', error);
+      alert('Server error. Try again later.');
+    }
   };
 
   return (
@@ -47,6 +75,7 @@ export default function Register() {
           <h2 className="register-heading">OI OI</h2>
           <p className="register-description">Create your username</p>
           <input
+            required
             type="text"
             placeholder="Enter username"
             value={username}
@@ -71,13 +100,28 @@ export default function Register() {
         <>
           <h2 className="register-heading">OI OI</h2>
           <p className="register-description">Your secure password below</p>
+          <p className="register-description">Please copy your password and save somewhere secure. <b>We recommend keepass.</b></p>
           <div className="password-display">
             <button className="copy-button" onClick={handleCopy}>
               Copy
             </button>
             <span className="password-text">{generatedPassword}</span>
           </div>
-          <button className="register-button access-button" onClick={() => navigate('/login')}>Access</button>
+
+           {copied && (
+            <div style={{
+              color: '#00ff00',
+              backgroundColor: '#000',
+              padding: '10px',
+              borderRadius: '5px',
+              fontFamily: 'monospace',
+              marginTop: '10px'
+            }}>
+              Copied to clipboard
+            </div>
+          )}
+
+          <button className="register-button access-button" onClick={registerUser}>Access</button>
         </>
       )}
     </div>

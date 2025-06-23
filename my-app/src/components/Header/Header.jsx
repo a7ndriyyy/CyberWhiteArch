@@ -5,7 +5,7 @@ import Login from '../Login/Login';
 
 const Header = () => {
   return (
-    <div className='global-header'>
+    <div className='global-header background-global-header'>
    <header className="header-container">
     {/* <div className='container-header-inside'> */}
       <Link to="/" className="logo">

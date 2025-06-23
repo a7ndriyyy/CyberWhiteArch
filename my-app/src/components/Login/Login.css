@@ -64,3 +64,25 @@
   color: #707989;
   text-decoration: none;
 }
+
+.access-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.access-button {
+  padding: 10px 20px;
+  background-color: #0a2a66;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: inherit;
+  transition: background-color 0.3s ease;
+}
+
+.access-button:hover {
+  background-color: #0056b3;
+}
