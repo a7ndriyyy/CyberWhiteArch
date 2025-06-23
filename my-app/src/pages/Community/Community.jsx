@@ -1,6 +1,7 @@
 import React from 'react';
 import CommunityPage from '../../components/CommunityPage/CommunityPage';
-import ChatCard from '../../components/CommunityPage/sectionCommunity/chatSection';
+import ChatCard from '../../components/CommunityPage/sectionChat/chatSection';
+import PrivacyInfo from '../../components/CommunityPage/sectionBenefits/PrivacyInfo';
 
 const Community = () => {
   return (
@@ -8,6 +9,7 @@ const Community = () => {
       <section >
         <CommunityPage />
         <ChatCard/>
+        <PrivacyInfo/>
       </section>
     </main>
   );
