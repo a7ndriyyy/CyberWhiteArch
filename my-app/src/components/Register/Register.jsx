@@ -68,8 +68,7 @@ export default function Register() {
 
   return (
     <div className="register-fullscreen">
-      <img src={logo} alt="Logo" className="register-logo" />
-
+      <img src={logo} alt="Logo" className="register-logo cyber-logo" />
       {step === 1 && (
         <>
           <h2 className="register-heading">OI OI</h2>

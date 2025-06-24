@@ -35,7 +35,7 @@ export default function Login() {
         localStorage.setItem("isLoggedIn", "true");
         setResponseMsg("🟢 Login successful. Welcome to CyberCore.");
         setTimeout(() => {
-          navigate("/pagetest");
+           navigate("/app/welcome");
         }, 1000); // невелика затримка для стилю
       } else {
         setResponseMsg(`${data.msg}`);
@@ -49,7 +49,7 @@ export default function Login() {
   return (
     <div className="login-container">
       <div className="logo-left">
-        <img src={logo} alt="Logo" className="login-logo" />
+        <img src={logo} alt="Logo" className="login-logo cyber-logo" />
         <h2>OI OI</h2>
         <p>Please enter your login data</p>
       </div>
