@@ -33,7 +33,7 @@ const CyberBanner = () => (
   </button>
 </div>
         </div>
-         <img src={bunnylogo} alt="bunylogo" />
+         <img src={bunnylogo} alt="bunylogo" className='cyber-logo' />
     </div>
   </section>
 );

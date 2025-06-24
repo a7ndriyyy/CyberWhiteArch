@@ -11,7 +11,7 @@ const CommunityPage = () => {
 
    <section className="community-section">
       <div className="left-image">
-        <img src={hackerImg} alt="Hacker silhouette" />
+        <img src={hackerImg} alt="Hacker silhouette" className='cyber-logo'/>
       </div>
 
       <div className="right-content">

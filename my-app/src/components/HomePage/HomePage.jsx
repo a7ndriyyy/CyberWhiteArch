@@ -8,7 +8,7 @@ const HomePage = () => {
 
       <section className='container'>
         <div className='homecontainer'>
-            <img src={logoHome} alt="Placeholder Image" className='logoimage' />
+            <img src={logoHome} alt="Placeholder Image" className='logoimage cyber-logo' />
             <div className='homecircle'>
             <h1 className='hometitle'>CyberWhiteHat</h1>
             <p className='hometext'>Join a community of experts, explore cutting-edge tools,and master the art of ethical hacking</p>

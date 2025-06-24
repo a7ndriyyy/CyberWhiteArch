@@ -29,7 +29,7 @@ const PrivacyInfo = () => (
     <div className="privacy-features">
       {features.map(({ icon, label }, index) => (
         <div key={index} className="feature-card wrapper">
-          <img src={icon} alt={label} className="feature-icon" />
+          <img src={icon} alt={label} className="feature-icon cyber-logo" />
           <p>{label}</p>
         </div>
       ))}
