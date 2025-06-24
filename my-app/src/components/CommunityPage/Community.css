@@ -85,3 +85,18 @@
   cursor: pointer;
   font-size: 0.8rem;
 }
+
+
+.right-content h2:hover,
+.right-content p:hover{
+  animation: glitch 0.2s infinite;
+}
+
+
+@keyframes glitch {
+  0% { text-shadow: 2px 2px #21a1f1, -2px -2px #21a1f1; }
+  25% { text-shadow: -2px -2px #21a1f1, 2px 2px #21a1f1; }
+  50% { text-shadow: 2px -2px #21a1f1, -2px 2px #21a1f1; }
+  75% { text-shadow: -2px 2px #21a1f1, 2px -2px #21a1f1; }
+  100% { text-shadow: 2px 2px #21a1f1, -2px -2px #21a1f1; }
+}

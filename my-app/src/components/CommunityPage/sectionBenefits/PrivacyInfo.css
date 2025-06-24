@@ -38,6 +38,13 @@
   color: #ccc;
 }
 
+.privacy-title:hover {
+  animation: glitch 0.2s infinite;
+}
+.privacy-info-text:hover {
+  animation: glitch 0.2s infinite;
+}
+
 .privacy-features {
   display: flex;
   flex-wrap: wrap;
@@ -65,4 +72,13 @@
   width: 80px;
   height: 80px;
   margin-bottom: 12px;
+}
+
+
+@keyframes glitch {
+  0% { text-shadow: 2px 2px #21a1f1, -2px -2px #21a1f1; }
+  25% { text-shadow: -2px -2px #21a1f1, 2px 2px #21a1f1; }
+  50% { text-shadow: 2px -2px #21a1f1, -2px 2px #21a1f1; }
+  75% { text-shadow: -2px 2px #21a1f1, 2px -2px #21a1f1; }
+  100% { text-shadow: 2px 2px #21a1f1, -2px -2px #21a1f1; }
 }

@@ -87,7 +87,6 @@ margin-bottom: 40px;
 
 /* Optional: unique styles for specific blocks */
 .grid-item.news {
-background: rgba(41, 43, 51, 0.70);
   color: white;
   width: 350px;
 height: 360px;
@@ -242,3 +241,79 @@ box-shadow: 0px 2.966px 7.414px 0px rgba(23, 24, 28, 0.60);
   box-shadow: none;
 }
 
+
+
+
+
+.box {
+  display: grid;
+  place-content: center;
+  color: #00d9ff; /* Bright neon blue text */
+  text-shadow: 0 0 8px #00d9ff;
+
+  /* Custom Properties */
+  --border-angle: 0turn;
+  --main-bg: conic-gradient(
+    from var(--border-angle),
+    #000,
+    #020e20 20%,
+    #000 80%,
+    #020e20
+  );
+  --gradient-border: conic-gradient(
+    from var(--border-angle),
+    transparent 20%,
+    #00d9ff,
+    #005eff 99%,
+    transparent
+  );
+
+  /* Border & Radius */
+  border: solid 5px transparent;
+
+  /* Layered Backgrounds */
+  background:
+    var(--main-bg) padding-box,
+    var(--gradient-border) border-box,
+    var(--main-bg) border-box;
+  background-position: center;
+
+  /* Animation */
+  animation: bg-spin 3s linear infinite;
+  font-family: 'Courier New', monospace;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+/* Custom Property Animation Support */
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0turn;
+}
+
+/* Spin Animation */
+@keyframes bg-spin {
+  to {
+    --border-angle: 1turn;
+  }
+}
+
+/* Pause animation on hover */
+.box:hover {
+  animation-play-state: paused;
+}
+
+.what-title:hover,
+.what-text:hover {
+  animation: glitch 0.2s infinite;
+}
+
+
+@keyframes glitch {
+  0% { text-shadow: 2px 2px #21a1f1, -2px -2px #21a1f1; }
+  25% { text-shadow: -2px -2px #21a1f1, 2px 2px #21a1f1; }
+  50% { text-shadow: 2px -2px #21a1f1, -2px 2px #21a1f1; }
+  75% { text-shadow: -2px 2px #21a1f1, 2px -2px #21a1f1; }
+  100% { text-shadow: 2px 2px #21a1f1, -2px -2px #21a1f1; }
+}

@@ -75,6 +75,14 @@ line-height: normal;
 
 }
 
+.hometext:hover{
+     animation: glitch 0.2s infinite;
+}
+
+.hometitle:hover{
+     animation: glitch 0.2s infinite;
+}
+
 
  .home-button{
       width: 670.25px;
@@ -87,4 +95,15 @@ fill: #303741;
     display: inline-flex;
 justify-content: center;
 align-items: center;
+}
+
+
+
+
+@keyframes glitch {
+  0% { text-shadow: 2px 2px #21a1f1, -2px -2px #21a1f1; }
+  25% { text-shadow: -2px -2px #21a1f1, 2px 2px #21a1f1; }
+  50% { text-shadow: 2px -2px #21a1f1, -2px 2px #21a1f1; }
+  75% { text-shadow: -2px 2px #21a1f1, 2px -2px #21a1f1; }
+  100% { text-shadow: 2px 2px #21a1f1, -2px -2px #21a1f1; }
 }
