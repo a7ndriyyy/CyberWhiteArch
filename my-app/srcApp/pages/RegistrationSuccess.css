@@ -1,0 +1,38 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+.registration-success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #111;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+}
+
+.register-style {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  font-size: 2.5rem;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+
+}
+
+.start-setup-btn {
+  padding: 25px 150px;
+  font-size: 1.5rem;
+  color: #fff;
+  background-color: #333;
+  font-family: 'Share Tech Mono', monospace;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.start-setup-btn:hover {
+  background-color: #555;
+}

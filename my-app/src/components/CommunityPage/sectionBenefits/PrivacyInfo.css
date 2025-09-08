@@ -82,3 +82,36 @@
   75% { text-shadow: -2px 2px #21a1f1, 2px -2px #21a1f1; }
   100% { text-shadow: 2px 2px #21a1f1, -2px -2px #21a1f1; }
 }
+
+
+.cyber-logo {
+  animation: float 4s ease-in-out infinite, flicker 2.5s infinite;
+  filter: drop-shadow(0 0 5px #21a1f1) drop-shadow(0 0 10px #00d9ff88);
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+/* Float effect */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Flickering glow */
+@keyframes flicker {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px #21a1f1) drop-shadow(0 0 10px #21a1f1);
+  }
+  50% {
+    filter: drop-shadow(0 0 2px #00d9ff33);
+  }
+}
+
+/* Optional: scale on hover */
+.cyber-logo:hover {
+  transform: scale(1.05);
+}

@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+.hacker-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: black;
+  color: #21a1f1;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 2rem;
+  text-shadow: 0 0 5px #084368, 0 0 15px #4dafec;
+}
+
+pre {
+  white-space: pre-wrap;
+  text-align: center;
+}

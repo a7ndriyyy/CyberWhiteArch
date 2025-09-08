@@ -1,4 +1,6 @@
-import React from 'react';
+import React from 'react';  
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import PublicLayout from '../layouts/PublicLayouts';
@@ -15,7 +17,24 @@ import Community from './pages/Community/Community';
 import SourceFiles from './pages/SourceFiles/SourceFiles';
 
 // Social network pages
-import WelcomePage from '../srcApp/pages/WelcomePage';
+import RegistrationSuccess from '../srcApp/pages/RegistrationSuccess';
+import Dashboard from '../srcApp/pages/InSystem/Dashboard';
+import HackerLoader from '../srcApp/componentsApp/HackerLoader/HackerLoader';
+
+// Контейнер для лоадера + редірект
+function WelcomePage() {
+  const [view, setView] = useState('registered'); // "registered" | "loading"
+  const navigate = useNavigate();
+
+  const startSetup = () => setView('loading');
+  const finishLoading = () => navigate('/app/dashboard');
+    return (
+    <>
+      {view === 'registered' && <RegistrationSuccess onStartSetup={startSetup} />}
+      {view === 'loading' && <HackerLoader durationMs={7000} onFinish={finishLoading} />}
+    </>
+  );
+}
 
 function App() {
   // Imagine a function that checks if user is authenticated
@@ -40,13 +59,22 @@ function App() {
        <Route
     path="welcome"
     element={
-      <ProtectedRoute isAllowed={isAuthenticated}>
-        <WelcomePage />
-      </ProtectedRoute>
+       <ProtectedRoute isAllowed={isAuthenticated}>
+                <WelcomePage />
+              </ProtectedRoute>
     }
   />
           {/* more social network routes */}
+          <Route
+            path="dashboard"
+            element={
+              <ProtectedRoute isAllowed={isAuthenticated}>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
         </Route> 
+        
 
       </Routes>
     </Router>
