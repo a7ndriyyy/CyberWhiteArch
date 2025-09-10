@@ -18,7 +18,8 @@ import SourceFiles from './pages/SourceFiles/SourceFiles';
 
 // Social network pages
 import RegistrationSuccess from '../srcApp/pages/RegistrationSuccess';
-import Dashboard from '../srcApp/pages/InSystem/Dashboard';
+// import Dashboard from '../srcApp/pages/InSystem/Dashboard';
+import CoverPage from '../srcApp/pages/InSystem/CoverPage';
 import HackerLoader from '../srcApp/componentsApp/HackerLoader/HackerLoader';
 
 // Контейнер для лоадера + редірект
@@ -69,7 +70,8 @@ function App() {
             path="dashboard"
             element={
               <ProtectedRoute isAllowed={isAuthenticated}>
-                <Dashboard />
+                {/* <Dashboard /> */}
+                <CoverPage/>
               </ProtectedRoute>
             }
           />

@@ -1,0 +1,27 @@
+.cw-rightbar {
+  display: grid; gap: var(--gap);
+  height: 100%;
+}
+
+.cw-panel {
+  padding: 12px;
+  background: var(--elev-1);
+}
+.cw-panel-title {
+  margin: 0 0 8px 0; font-size: 14px; color: var(--muted);
+}
+
+.cw-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px; border-radius: var(--radius-md); border: 1px solid var(--stroke);
+  background: var(--card); margin-top: 8px;
+}
+.cw-row:hover { background: var(--elev-2); }
+
+.cw-community { display: flex; align-items: center; gap: 10px; }
+.cw-row strong { display: block; }
+.cw-avatar {
+  width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-weight: 800;
+  color: #001110; background: linear-gradient(180deg, #7fffd4, #2bbda9);
+}
+.cw-pill { background: var(--elev-2); color: var(--text); }
