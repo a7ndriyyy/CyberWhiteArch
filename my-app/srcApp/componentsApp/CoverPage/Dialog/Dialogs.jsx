@@ -36,13 +36,57 @@ export default function Dialogs() {
         <div className="cw-dialogs__brand">CyberWhiteHat</div>
       </div>
 
-      <div className="cw-dialogs__folders">
-        <button className="cw-dialogs__chip" aria-current="page">All</button>
-        <button className="cw-dialogs__chip">Personal</button>
-        <button className="cw-dialogs__chip">Groups</button>
-        <button className="cw-dialogs__chip">Channels</button>
-        <button className="cw-dialogs__chip">Bots</button>
-      </div>
+        {/* NEW — Sidebar menu card */}
+
+      <nav className="cw-sidenav cw-card" aria-label="Primary">
+        <a className="cw-sidenav__item is-active" href="#">
+          <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M3 11.5 12 4l9 7.5" />
+            <path d="M5 10.5V20h14v-9.5" />
+          </svg>
+          Home
+        </a>
+
+        <a className="cw-sidenav__item" href="#">
+          <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-3.5-3.5" />
+          </svg>
+          Explore
+        </a>
+
+        <a className="cw-sidenav__item" href="#">
+          <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <path d="M3 8h18" />
+          </svg>
+          Messages
+        </a>
+
+        <a className="cw-sidenav__item" href="#">
+          <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
+          </svg>
+          Community
+        </a>
+
+        <a className="cw-sidenav__item" href="#">
+          <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Z" />
+            <path d="M2 22a10 10 0 0 1 20 0" />
+          </svg>
+          Profile
+        </a>
+
+        <a className="cw-sidenav__item" href="#">
+          <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Create Tool
+        </a>
+      </nav>
+
+
 
       <div className="cw-dialogs__card">
         <div className="cw-dialogs__search">

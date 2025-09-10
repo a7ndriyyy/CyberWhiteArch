@@ -7,11 +7,11 @@ export default function Center() {
       {/* Topbar with tabs */}
       <div className="cw-topbar cw-card">
         <div className="cw-tabs">
-          <button className="cw-tab" aria-selected="true">Chat</button>
-          <button className="cw-tab">Discover</button>
+          <button className="cw-tab" aria-selected="true">Home</button>
+          <button className="cw-tab">Explore</button>
           <button className="cw-tab">Following</button>
         </div>
-        <button className="cw-chip" id="themeToggle">
+        <button className="cw-chip" id="themeToggle" title="Toggle theme">
           <svg className="cw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/>
           </svg>
@@ -19,7 +19,45 @@ export default function Center() {
         </button>
       </div>
 
-      {/* Conversation thread */}
+      {/* NEW — Post composer on top */}
+      <section className="cw-postbox cw-card" aria-label="Create post">
+        <div className="cw-postbox-row">
+          <div className="cw-avatar cw-avatar--teal">U</div>
+
+          <div className="cw-postbox-inputWrap">
+            <textarea
+              className="cw-postbox-input"
+              placeholder="What's happening in the lab?"
+              rows={3}
+            />
+          </div>
+        </div>
+
+        <div className="cw-postbox-actions">
+          <div className="cw-postbox-tools">
+            <button className="cw-icon-btn" title="Add media" aria-label="Add media">
+              <svg className="cw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="M10 13l2-2 4 4M7 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+              </svg>
+            </button>
+            <button className="cw-icon-btn" title="Poll" aria-label="Poll">
+              <svg className="cw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M4 19V5M10 19v-8M16 19V8M22 19V3"/>
+              </svg>
+            </button>
+            <button className="cw-icon-btn" title="Circle" aria-label="Circle">
+              <svg className="cw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <circle cx="12" cy="12" r="8" />
+              </svg>
+            </button>
+          </div>
+
+          <button className="cw-btn-post">Post</button>
+        </div>
+      </section>
+
+      {/* Feed / thread */}
       <section className="cw-thread cw-card" aria-label="Conversation">
         {/* Telegram-like message */}
         <div className="cw-msg">
@@ -47,7 +85,7 @@ export default function Center() {
               <span className="cw-muted">· 10m in r/design</span>
             </div>
             <div style={{ marginTop: "6px" }}>
-              Building a privacy‑first network that feels like chat but scales like a feed.
+              Building a privacy-first network that feels like chat but scales like a feed.
             </div>
             <div className="cw-media-grid">
               <div className="cw-media">IMG</div>
@@ -91,29 +129,6 @@ export default function Center() {
           </div>
         </div>
       </section>
-
-      {/* Composer at bottom */}
-      <div className="cw-composer cw-card">
-        <button className="cw-icon-btn" title="Attach" aria-label="Attach">
-          <svg className="cw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M21.44 11.05 12.66 19.8a5 5 0 0 1-7.07-7.07l8.78-8.75a3 3 0 1 1 4.25 4.25l-8.49 8.46a1 1 0 1 1-1.41-1.41l8.19-8.16"/>
-          </svg>
-        </button>
-        <input placeholder="Message or post…" />
-        <button className="cw-icon-btn" title="Emoji" aria-label="Emoji">
-          <svg className="cw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M9 10h.01M15 10h.01"/>
-            <path d="M8 15s1.5 2 4 2 4-2 4-2"/>
-          </svg>
-        </button>
-        <button className="cw-btn-primary">
-          <svg className="cw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="m22 2-7 20-4-9-9-4Z"/>
-          </svg>
-          Send
-        </button>
-      </div>
     </main>
   );
 }
