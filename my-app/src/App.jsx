@@ -18,9 +18,11 @@ import SourceFiles from './pages/SourceFiles/SourceFiles';
 
 // Social network pages
 import RegistrationSuccess from '../srcApp/pages/RegistrationSuccess';
-// import Dashboard from '../srcApp/pages/InSystem/Dashboard';
 import CoverPage from '../srcApp/pages/InSystem/CoverPage';
 import HackerLoader from '../srcApp/componentsApp/HackerLoader/HackerLoader';
+import ProfilePage from '../srcApp/pages/InSystem/Profile/ProfilePage';
+import CommunityPage from '../srcApp/pages/InSystem/Community/CommunityPage';
+import DMPage from '../srcApp/pages/InSystem/DM/DMPage'; 
 
 // Контейнер для лоадера + редірект
 function WelcomePage() {
@@ -28,7 +30,7 @@ function WelcomePage() {
   const navigate = useNavigate();
 
   const startSetup = () => setView('loading');
-  const finishLoading = () => navigate('/app/dashboard');
+  const finishLoading = () => navigate('/app/');
     return (
     <>
       {view === 'registered' && <RegistrationSuccess onStartSetup={startSetup} />}
@@ -56,26 +58,25 @@ function App() {
         </Route>
 
         {/* Social network routes (protected) */}
-      <Route path="/app/*" element={<PlatformLayouts />}>
-       <Route
-    path="welcome"
-    element={
-       <ProtectedRoute isAllowed={isAuthenticated}>
-                <WelcomePage />
-              </ProtectedRoute>
-    }
-  />
-          {/* more social network routes */}
-          <Route
-            path="dashboard"
-            element={
-              <ProtectedRoute isAllowed={isAuthenticated}>
-                {/* <Dashboard /> */}
-                <CoverPage/>
-              </ProtectedRoute>
-            }
-          />
-        </Route> 
+     <Route path="/app/*" element={<PlatformLayouts />}>
+  {/* protect everything inside */}
+  <Route element={<ProtectedRoute isAllowed={isAuthenticated} />}>
+    {/* Home of the social app = CoverPage */}
+    <Route index element={<CoverPage />} />
+
+    {/* Optional alias: keep /app/dashboard working */}
+    <Route path="dashboard" element={<Navigate to="." replace />} />
+
+    <Route path="welcome" element={<WelcomePage />} />
+    <Route path="profile" element={<ProfilePage />} />
+    <Route path="community" element={<CommunityPage />} />
+    <Route path="dm" element={<DMPage />} />
+
+  </Route>
+</Route>
+     
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
         
 
       </Routes>

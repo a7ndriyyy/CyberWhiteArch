@@ -1,0 +1,263 @@
+/* ====== LAYOUT: panel | main (no left rail) ====== */
+.dm-layout{
+  display:grid;
+  grid-template-columns: 0 1fr;            /* panel CLOSED */
+  transition: grid-template-columns .22s ease;
+  column-gap:0;
+  row-gap: var(--gap);
+  height:100vh;
+  padding:14px;
+  overflow:hidden;                          /* clip 0-width track */
+}
+.dm-layout.is-panel-open{
+  grid-template-columns: 280px 1fr;        /* panel OPEN */
+}
+
+/* ====== CHAT LIST (panel — column 1) ====== */
+.dm-panel{
+  width:100%;                               /* follow track width (0 or 280) */
+  position:sticky; top:14px; height:calc(100vh - 28px);
+  overflow:auto;
+  display:grid; grid-template-rows:auto 1fr; gap:10px; padding:10px;
+
+  border-right:1px solid var(--stroke);
+  border-top-right-radius:0;
+  border-bottom-right-radius:0;
+
+  /* hide interaction when collapsed */
+  visibility:hidden; pointer-events:none;
+}
+.dm-layout.is-panel-open .dm-panel{
+  visibility:visible; pointer-events:auto;
+}
+.dm-panel.cw-card{ box-shadow:none; }
+
+.dm-panel-search{
+  display:flex; align-items:center; gap:8px;
+  border:1px solid var(--stroke); background:var(--elev-1);
+  padding:10px; border-radius:12px;
+}
+.dm-panel-search input{
+  border:0; outline:0; background:transparent; color:var(--text); width:100%;
+}
+.dm-panel-list{  gap:8px; }
+.dm-panel-item{
+  display:grid; grid-template-columns:36px 1fr auto; gap:10px; align-items:center;
+  text-align:left; border:1px solid var(--stroke); background:var(--card);
+  border-radius:12px; padding:10px;
+}
+.dm-panel-item.is-active{ box-shadow:inset 0 0 0 2px #49d5c3; background:#0f1f27; }
+.dm-item-main{ min-width:0; }
+.dm-item-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.dm-ellipsis{ overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.dm-unread{ min-width:20px; height:20px; padding:0 6px; display:grid; place-items:center; border-radius:10px; background:#30c5b4; color:#001110; font-weight:700; font-size:12px; }
+.dm-muted{ color:var(--muted); }
+
+/* ====== MAIN COLUMN ====== */
+.dm-page{ min-width:0; min-height: 0;  display:grid; grid-template-rows:auto 1fr; gap:10px; }
+
+/* Header (unchanged) */
+.dm-top{
+  position:sticky; top:0; z-index:20;
+  display:grid; grid-template-columns:1fr auto; grid-template-rows:auto auto;
+  align-items:center; gap:10px;
+  padding:10px 12px; background:var(--elev-1);
+  border:1px solid var(--stroke); border-radius:var(--radius-lg); box-shadow:var(--shadow);
+  border-top-left-radius:0;  /* stays flush with panel divider */
+}
+.dm-top-left{ grid-column:1; grid-row:1; display:flex; align-items:center; gap:10px; }
+.dm-top-right{ grid-column:2; grid-row:1; justify-self:end; display:flex; align-items:center; gap:8px; }
+.dm-top-row{ grid-column:1 / -1; grid-row:2; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.e2e-key{
+  margin-left:auto; font-size:12px; color:var(--muted);
+  border:1px solid var(--stroke); background:var(--elev-2);
+  padding:4px 8px; border-radius:8px;
+}
+
+/* ====== BODY (messages + composer) ====== */
+
+
+
+.dm-msg{ display:grid; grid-template-columns:36px minmax(0,1fr) 36px; align-items:start; gap:8px; }
+.dm-msg.mine{ grid-template-columns:minmax(0,1fr) 36px; }
+.dm-avatar{ width:36px; height:36px; border-radius:12px; display:grid; place-items:center; font-weight:800; background:var(--elev-2); border:1px solid var(--stroke); }
+.dm-avatar.dm-me{ color:#001110; background:linear-gradient(180deg,#7fffd4,#2bbda9); }
+.dm-bubble{ border:1px solid var(--stroke); background:var(--elev-1); border-radius:14px; padding:10px 12px; line-height:1.45; max-width:900px; }
+.dm-msg.mine .dm-bubble{ background:linear-gradient(135deg,#154042,#17425a); color:#e8f7ff; }
+.dm-msg.mine .dm-avatar{ grid-column:2; }
+.dm-meta{ color:var(--muted); margin-bottom:4px; }
+.dm-reactions{ display:flex; gap:8px; margin-top:8px; color:var(--muted); }
+
+/* Composer */
+.dm-composer{ border-top:1px solid var(--stroke); padding:10px; display:grid; grid-template-rows:auto 40px 0fr; gap:8px; transition:grid-template-rows .18s ease, padding .18s ease, background .18s ease; background:var(--elev-1); }
+.dm-composer.is-active{ grid-template-rows:auto 68px 1fr; }
+.dm-vanish{ text-align:right; color:var(--muted); font-size:12px; min-height:16px; }
+.dm-input{ border:1px solid var(--stroke); border-radius:12px; background:var(--elev-2); padding:6px 8px; display:flex; align-items:center; }
+.dm-input textarea{ width:100%; border:0; outline:0; background:transparent; color:var(--text); resize:none; min-height:28px; max-height:120px; line-height:1.5; }
+.dm-pad{ overflow:hidden; display:flex; gap:8px; align-items:center; }
+.dm-pad .spacer{ flex:1; }
+
+/* Card primitive */
+.cw-card{ background:var(--card); border:1px solid var(--stroke); border-radius:var(--radius-lg); box-shadow:var(--shadow); }
+
+
+.dm-body{
+  display:grid;
+  grid-template-rows:1fr auto;
+  overflow:hidden;
+  min-height:0;                 /* критично для скролу всередині Grid */
+}
+
+
+
+/* Adaptive, unbreakable bubbles */
+.dm-msg.mine .dm-bubble{ justify-self: end; }
+
+.dm-bubble{
+  display: inline-block;             /* shrink-to-content (not full 1fr) */
+  padding: 10px 12px;
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  background: var(--elev-1);
+  line-height: 1.45;
+
+  /* ADAPTIVE WIDTH:
+     - cap by characters for readability
+     - AND by percentage of the chat column so it never spans too wide
+  */
+  max-width: min(72ch, 70%);         /* desktop cap; tweak % to taste */
+
+  /* WRAPPING BEHAVIOR:
+     - preserve newlines
+     - wrap long words/URLs instead of overflowing
+  */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;           /* modern */
+  word-break: break-word;            /* Safari fallback */
+  hyphens: auto;                     /* nicer hyphenation when available */
+
+  /* Anchor to the LEFT by default */
+  justify-self: start;
+}
+
+/* Media inside bubbles should never overflow */
+.dm-bubble img,
+.dm-bubble video,
+.dm-bubble iframe {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* Mobile: allow a bit wider bubbles for narrow screens */
+@media (max-width: 700px){
+  .dm-bubble { max-width: 86%; }
+}
+
+
+/* Your own messages: push bubble to the RIGHT edge */
+.dm-msg.mine .dm-bubble{
+  justify-self: end;
+}
+
+/* Keep avatars positioned as you already do */
+.dm-avatar.dm-me{ grid-column: 2; }  
+
+
+
+
+
+/* Make the message list scrollable and position helpers */
+.dm-scroll{
+  height:100%;
+  min-height:0;                 /* 🔴 без цього часто не скролиться */
+  overflow-y:auto;
+  position:relative;
+  scroll-behavior:smooth;
+
+  /* жестами/тачпадом */
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+
+  /* без внутрішнього відступу — перенесемо в .dm-scroll-inner */
+  padding:0;
+}
+
+/* ВНУТРІШНІЙ КОНТЕЙНЕР (flex-колонка) */
+.dm-scroll-inner{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-height:100%;
+  justify-content:flex-end;     /* коли меседжів мало — прилипають до низу */
+
+  padding:16px;
+  padding-bottom: calc(var(--composer-h, 76px) + 12px);  /* місце під композер */
+  scroll-padding-bottom: calc(var(--composer-h, 76px) + 12px);
+}
+
+
+
+
+.dm-date{ position:relative; margin:10px 0; text-align:center; pointer-events:none; }
+.dm-date::before{ content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:var(--stroke); opacity:.6; }
+.dm-date>span{ position:relative; display:inline-block; padding:3px 10px; border-radius:9999px; border:1px solid var(--stroke); background:var(--elev-1); color:var(--muted); font-size:12px; pointer-events:auto; }
+
+/* кнопка “до останніх” */
+.dm-jump-latest{
+  position:absolute; right:12px; bottom:12px;
+  padding:6px 10px; border-radius:9999px;
+  border:1px solid var(--stroke); background:var(--elev-2);
+  color:var(--text); box-shadow:var(--shadow); cursor:pointer; font-size:12px;
+}
+.dm-jump-latest:hover{ background:var(--elev-3); }
+
+
+.dm-date{ pointer-events: none; }
+.dm-date > span{ pointer-events: auto; } /* клікабельний чіп при потребі */
+
+/* Date separator */
+.dm-date{
+  position: relative;
+  margin: 10px 0;
+  text-align: center;
+}
+.dm-date::before{
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--stroke);
+  opacity: .6;
+}
+.dm-date > span{
+  position: relative;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--stroke);
+  background: var(--elev-1);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Jump-to-latest button */
+.dm-jump-latest{
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--stroke);
+  background: var(--elev-2);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  font-size: 12px;
+}
+.dm-jump-latest:hover{ background: var(--elev-3); }
+
+/* (from the previous step) adaptive bubbles */
+

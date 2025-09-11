@@ -1,6 +1,7 @@
 // src/pages/CoverPage/components/Dialogs.jsx
 import React from "react";
 import "./Dialogs.css";
+import { NavLink } from "react-router-dom";
 
 const dialogsData = [
   {
@@ -55,28 +56,27 @@ export default function Dialogs() {
           Explore
         </a>
 
-        <a className="cw-sidenav__item" href="#">
+        <NavLink to="/app/dm" className="cw-sidenav__item">
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <rect x="3" y="5" width="18" height="14" rx="2" />
             <path d="M3 8h18" />
           </svg>
           Messages
-        </a>
+        </NavLink>
 
-        <a className="cw-sidenav__item" href="#">
+       <NavLink to="/app/community" className="cw-sidenav__item">
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
           </svg>
           Community
-        </a>
+        </NavLink>
 
-        <a className="cw-sidenav__item" href="#">
+       <NavLink to="/app/profile" className="cw-sidenav__item">
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Z" />
-            <path d="M2 22a10 10 0 0 1 20 0" />
+            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Z"/><path d="M2 22a10 10 0 0 1 20 0"/>
           </svg>
           Profile
-        </a>
+        </NavLink>
 
         <a className="cw-sidenav__item" href="#">
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
