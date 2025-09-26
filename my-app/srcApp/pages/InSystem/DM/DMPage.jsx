@@ -80,7 +80,18 @@ export default function DMPage() {
       : { on: true, endsAt: Date.now() + 60 * 60 * 1000 });
   };
 
-  const sendMessage = (text) => {
+
+
+const sendMessage = (payload) => {
+   // підтримка і старого рядкового виклику, і нового об’єкта
+   let text = "", attachments = [], code = null;
+   if (typeof payload === "string") {
+     text = payload;
+   } else if (payload && typeof payload === "object") {
+     text = payload.text || "";
+     attachments = payload.attachments || [];
+     code = payload.code || null;
+ }
     const next = {
       id: Date.now(),
       ts: Date.now(),
@@ -88,6 +99,8 @@ export default function DMPage() {
       author: "You",
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       text,
+      attachments,
+      code,
       mine: true
     };
     setMessages((m) => [...m, next]);

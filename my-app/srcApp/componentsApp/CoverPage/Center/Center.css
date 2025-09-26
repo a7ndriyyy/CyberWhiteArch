@@ -1,62 +1,109 @@
+/* ========= Center.css (clean replacement) =========
+   Assumes your :root already defines:
+   --elev-1 --elev-2 --card --stroke --text --muted
+   --accent --accent-2 --gap --radius --radius-lg
+   (fallbacks included where helpful)
+==================================================== */
+
+/* Layout root */
 .cw-center {
   display: grid;
   grid-template-rows: auto auto 1fr;
-  gap: var(--gap);
+  gap: var(--gap, 12px);
   height: 100%;
 }
 
-
-.cw-postbox {
-  padding: 12px;
-  background: var(--elev-1);
+/* ---------- Top bar ---------- */
+.cw-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--elev-1, #10171d);
+  border: 1px solid var(--stroke, #1e2a33);
+  border-radius: var(--radius-lg, 12px);
+}
+.cw-tabs { display: flex; gap: 8px; }
+.cw-tab {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--elev-2, #121c22);
+  border: 1px solid var(--stroke, #1e2a33);
+  color: var(--muted, #8ea4b0);
+  transition: filter .15s ease, transform .05s ease;
+}
+.cw-tab[aria-selected="true"] {
+  background: linear-gradient(180deg, var(--accent, #4bf2d7), var(--accent-2, #30e1c6));
+  color: #001110;
+  font-weight: 700;
+  border: none;
 }
 
+/* ---------- Generic card ---------- */
+.cw-card {
+  background: var(--elev-1, #10171d);
+  border: 1px solid var(--stroke, #1e2a33);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+}
+
+/* ---------- Composer / Postbox ---------- */
+.cw-postbox { padding: 12px; background: var(--elev-1, #10171d); }
 .cw-postbox-row {
   display: grid;
   grid-template-columns: 38px 1fr;
   gap: 10px;
   align-items: start;
 }
-
+.cw-avatar,
+.cw-avatar--teal {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #fff;
+}
+.cw-avatar { background: linear-gradient(180deg, #89f, #58b); }
 .cw-avatar--teal {
   color: #001110;
   background: linear-gradient(180deg, #7fffd4, #2bbda9);
-  border-radius: 12px;
-  width: 38px; height: 38px;
-  display: grid; place-items: center; font-weight: 800;
 }
 
 .cw-postbox-inputWrap {
-  background: var(--elev-2);
-  border: 1px solid var(--stroke);
-  border-radius: 12px;
+  background: var(--elev-2, #121c22);
+  border: 1px solid var(--stroke, #1e2a33);
+  border-radius: var(--radius, 12px);
   padding: 6px;
 }
-
 .cw-postbox-input {
   width: 100%;
-  resize: vertical;
   min-height: 72px;
   max-height: 220px;
+  resize: vertical;
   background: transparent;
-  color: var(--text);
+  color: var(--text, #e6f1f5);
   border: 0;
   outline: 0;
   font: inherit;
-  line-height: 1.4;
+  line-height: 1.45;
   padding: 8px 10px;
   border-radius: 8px;
 }
-
 .cw-postbox-actions {
   margin-top: 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-
 .cw-postbox-tools { display: flex; gap: 8px; }
 
+/* Buttons */
 .cw-btn-post {
   display: inline-flex;
   align-items: center;
@@ -67,109 +114,216 @@
   border: 0;
   color: #001110;
   font-weight: 700;
-  background: linear-gradient(180deg, var(--accent), var(--accent-2));
-  box-shadow: 0 0 24px rgba(48, 225, 198, 0.35);
+  background: linear-gradient(180deg, var(--accent, #4bf2d7), var(--accent-2, #30e1c6));
+  box-shadow: 0 0 24px rgba(48,225,198,.35);
+  transition: filter .15s ease;
 }
-
 .cw-btn-post:hover { filter: brightness(1.05); }
 
-/* top bar with tabs + theme button */
-.cw-topbar {
-  position: sticky; top: 0; z-index: 5;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px;
-  background: var(--elev-1);
+.cw-icon-btn,
+.cw-chip {
+  height: 36px;
+  min-width: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--elev-2, #121c22);
+  border: 1px solid var(--stroke, #1e2a33);
+  color: var(--text, #e6f1f5);
+  padding: 0 10px;
+  cursor: pointer;
+  transition: filter .15s ease, background .15s ease, color .15s ease;
 }
-.cw-tabs { display: flex; gap: 8px; }
-.cw-tab {
-  height: 34px; padding: 0 14px; border-radius: 999px;
-  background: var(--elev-2); border: 1px solid var(--stroke); color: var(--muted);
-}
-.cw-tab[aria-selected="true"] {
-  background: linear-gradient(180deg, var(--accent), var(--accent-2));
-  color: #001110; font-weight: 700; border: none;
-}
+.cw-chip { border-radius: 999px; height: 32px; }
+.cw-icon-btn:hover, .cw-chip:hover { filter: brightness(1.08); }
+.cw-icon-btn.is-active { outline: 2px solid var(--accent, #4bf2d7); }
 
-/* conversation / feed thread */
+/* ---------- Thread / Messages ---------- */
 .cw-thread {
-  display: grid; gap: 10px;
-  overflow: auto;
+  display: grid;
+  gap: 12px;
   padding: 12px;
-  background: var(--elev-1);
+  background: var(--elev-1, #10171d);
+  border-radius: var(--radius-lg, 12px);
+  overflow: auto;
 }
-
-/* messages */
 .cw-msg {
   display: grid;
   grid-template-columns: 38px 1fr;
   gap: 10px;
   align-items: start;
+  position: relative;
 }
-.cw-msg .cw-avatar {
-  width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center;
-  background: linear-gradient(180deg, #89f, #58b);
-  font-weight: 800;
-}
-.cw-msg.cw-me .cw-avatar { background: linear-gradient(180deg, #7fffd4, #2bbda9); color: #001110; }
-.cw-bubble {
-  padding: 10px 12px; background: var(--card); border: 1px solid var(--stroke);
-  border-radius: 12px; line-height: 1.45;
-}
-.cw-meta-row { display: flex; gap: 8px; align-items: baseline; color: var(--muted); font-size: 13px; margin-bottom: 4px; }
 
-/* embedded post */
+.cw-bubble {
+  background: var(--card, #0f1419);
+  border: 1px solid var(--stroke, #1e2a33);
+  border-radius: var(--radius, 12px);
+  padding: 12px 14px;
+  line-height: 1.5;
+  max-width: 900px;          /* prevents mega-wide bubbles on large screens */
+  transition: background .15s ease;
+}
+.cw-bubble:hover { background: var(--elev-2, #121c22); }
+
+.cw-meta-row {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  color: var(--muted, #8ea4b0);
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+/* Media inside a post */
+.cw-media-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.cw-media-grid img {
+  display: block;
+  width: 100%;
+  max-height: 260px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--stroke, #1e2a33);
+}
+
+/* Actions under a post */
+.cw-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.cw-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--elev-2, #121c22);
+  border: 1px solid var(--stroke, #1e2a33);
+  color: var(--muted, #8ea4b0);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, filter .15s ease;
+}
+.cw-action:hover {
+  background: var(--elev-1, #10171d);
+  color: var(--text, #e6f1f5);
+}
+
+/* Reactions & badges */
+.cw-reactions { margin-top: 8px; display: flex; gap: 8px; }
+.cw-react {
+  font-size: 13px;
+  color: var(--muted, #8ea4b0);
+  border: 1px solid var(--stroke, #1e2a33);
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: var(--elev-2, #121c22);
+}
+
+/* Embedded post (reposts) */
 .cw-post {
-  display: grid; grid-template-columns: 46px 1fr; gap: 10px;
-  background: var(--card); border: 1px solid var(--stroke); border-radius: var(--radius-lg);
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 10px;
+  background: var(--card, #0f1419);
+  border: 1px solid var(--stroke, #1e2a33);
+  border-radius: var(--radius-lg, 12px);
   padding: 12px;
 }
 .cw-vote {
-  display: grid; grid-template-rows: 20px 1fr 20px; align-items: center; justify-items: center;
-  background: var(--elev-2); border: 1px solid var(--stroke); border-radius: 12px; padding: 6px;
+  display: grid;
+  grid-template-rows: 20px 1fr 20px;
+  align-items: center;
+  justify-items: center;
+  background: var(--elev-2, #121c22);
+  border: 1px solid var(--stroke, #1e2a33);
+  border-radius: 12px;
+  padding: 6px;
 }
-.cw-score { font-weight: 700; color: var(--muted); }
-.cw-media-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;
-}
+.cw-score { font-weight: 700; color: var(--muted, #8ea4b0); }
 .cw-media {
-  height: 140px; border-radius: 12px; display: grid; place-items: center; letter-spacing: 1px;
-  background: linear-gradient(135deg, #1c3942, #18433e 60%, #1b564d); color: #bfe9e2;
-  border: 1px solid var(--stroke);
+  height: 140px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #1c3942, #18433e 60%, #1b564d);
+  color: #bfe9e2;
+  border: 1px solid var(--stroke, #1e2a33);
+}
+
+/* Reply input inside a post */
+.cw-dialogs__input {
+  background: var(--elev-2, #121c22);
+  border: 1px solid var(--stroke, #1e2a33);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: var(--text, #e6f1f5);
+}
+
+/* Footer composer (if used elsewhere) */
+.cw-composer {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 36px 1fr 36px auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  background: var(--elev-1, #10171d);
+  border: 1px solid var(--stroke, #1e2a33);
+  border-radius: var(--radius-lg, 12px);
+}
+.cw-composer input {
+  height: 40px;
+  width: 100%;
+  background: var(--elev-2, #121c22);
+  border: 1px solid var(--stroke, #1e2a33);
+  border-radius: 999px;
+  outline: 0;
+  color: var(--text, #e6f1f5);
+  padding: 0 12px;
+}
+
+/* Optional: emoji picker panel (if you swap inline styles for this class) */
+.cw-emoji-pop {
+  position: absolute;
+  right: 8px;
+  top: 40px;
+  z-index: 10;
+  background: var(--elev-2, #121c22);
+  border: 1px solid var(--stroke, #1e2a33);
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  gap: 6px;
+}
+
+/* make sure actions + reply stay under the bubble */
+.cw-actions,
+.cw-reactions,
+.cw-dialogs__input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  width: 100%;            /* take full width inside bubble */
 }
 
 .cw-actions {
-  display: flex; gap: 12px; margin-top: 10px;
-}
-.cw-action {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 8px 10px; border-radius: 10px;
-  background: var(--elev-2); border: 1px solid var(--stroke); color: var(--muted);
-}
-.cw-action:hover { filter: brightness(1.08); }
-
-/* reactions inside message bubble */
-.cw-reactions { margin-top: 8px; display: flex; gap: 8px; }
-.cw-react {
-  font-size: 13px; color: var(--muted);
-  border: 1px solid var(--stroke); border-radius: 999px; padding: 3px 8px; background: var(--elev-2);
+  justify-content: flex-start; /* left align buttons */
 }
 
-/* composer */
-.cw-composer {
-  position: sticky; bottom: 0; z-index: 5;
-  display: grid; grid-template-columns: 36px 1fr 36px auto; gap: 8px; align-items: center;
-  padding: 8px; background: var(--elev-1);
+.cw-bubble {
+  display: flex;
+  flex-direction: column;  /* stack children vertically */
+  align-items: flex-start; /* keep everything left */
 }
-.cw-composer input {
-  height: 40px; background: var(--elev-2); border: 1px solid var(--stroke);
-  border-radius: 999px; outline: 0; color: var(--text);
-  padding: 0 12px; width: 100%;
-}
-.cw-icon-btn {
-  width: 36px; height: 36px; border-radius: 10px;
-  display: grid; place-items: center; background: var(--elev-2); border: 1px solid var(--stroke);
-}
-.cw-icon-btn:hover { filter: brightness(1.08); }
-
-
-

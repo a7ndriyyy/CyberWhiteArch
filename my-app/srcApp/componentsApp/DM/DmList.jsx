@@ -17,11 +17,10 @@ function dayLabel(ts) {
 
 export default function DmList({ messages = [] }) {
   const scrollerRef = useRef(null);
-  const endRef = useRef(null);
-  const [following, setFollowing] = useState(true);   // auto-follow enabled?
-  const [showJump, setShowJump] = useState(false);    // show “↓ New messages”
+  const [following, setFollowing] = useState(true);
+  const [showJump, setShowJump] = useState(false);
 
-  // Build a flat list with date separators
+  // Готуємо список з датами
   const items = useMemo(() => {
     const out = [];
     let lastTs = null;
@@ -36,11 +35,9 @@ export default function DmList({ messages = [] }) {
     return out;
   }, [messages]);
 
-  // Helper: are we near the bottom?
-  const nearBottom = (el) =>
-    el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  const nearBottom = (el) => el.scrollHeight - el.scrollTop - el.clientHeight < 80;
 
-  // Track user scrolling: pause follow when scrolled up
+  // Відстежуємо скрол — якщо користувач не внизу, паузимо follow
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
@@ -50,18 +47,18 @@ export default function DmList({ messages = [] }) {
       setShowJump(!atBottom);
     };
     el.addEventListener("scroll", onScroll, { passive: true });
-    onScroll(); // initialize
+    onScroll();
     return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Scroll to bottom when items change and we're following
+  // Автопрокрутка донизу, коли з’являються нові елементи і ми "following"
   useLayoutEffect(() => {
-  const el = scrollerRef.current;
-  if (!el || !following) return;
-  requestAnimationFrame(() => {
-    el.scrollTop = el.scrollHeight;   // гарантовано в самий низ
-  });
-}, [messages, following]);
+    const el = scrollerRef.current;
+    if (!el || !following) return;
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+  }, [items, following]); // ← залежимо від items
 
   const jumpToLatest = () => {
     const el = scrollerRef.current;
@@ -72,38 +69,70 @@ export default function DmList({ messages = [] }) {
 
   return (
     <div className="dm-scroll" ref={scrollerRef}>
-      <div className="dm-scroll-iner">
-      {items.map((it) =>
-        it._type === "date" ? (
-          <div key={it.id} className="dm-date"><span>{it.label}</span></div>
-        ) : (
-          <div key={it.id} className={`dm-msg ${it.mine ? "mine" : ""}`}>
-            {!it.mine && <div className="dm-avatar">{it.from}</div>}
-            <div className="dm-bubble">
-              <div className="dm-meta">
-                <strong>{it.author}</strong>
-                <span className="cw-muted"> · {it.time}</span>
-              </div>
-              <div>{it.text}</div>
-              {!it.mine && (it.reactions?.thumbs || it.reactions?.ack) && (
-                <div className="dm-reactions">
-                  {it.reactions.thumbs ? <span>👍 {it.reactions.thumbs}</span> : null}
-                  {it.reactions.ack ? <span>✅ {it.reactions.ack}</span> : null}
-                </div>
-              )}
-            </div>
-            {it.mine && <div className="dm-avatar dm-me">U</div>}
-          </div>
-        )
-      )}
-       </div>
-      <div ref={endRef} />
+      <div className="dm-scroll-inner">{/* ВНУТРІШНІЙ flex-контейнер */}
+        {items.map((it) =>
+          it._type === "date" ? (
+            <div key={it.id} className="dm-date"><span>{it.label}</span></div>
+          ) : (
+            <div key={it.id} className={`dm-msg ${it.mine ? "mine" : ""}`}>
+              {!it.mine && <div className="dm-avatar">{it.from}</div>}
 
-     {showJump && (
-  <button className="dm-jump-latest" onClick={jumpToLatest}>
-    ↓ New messages
-  </button>
-)}
-</div>
+              <div className="dm-bubble">
+                <div className="dm-meta">
+                  <strong>{it.author}</strong>
+                  <span className="cw-muted"> · {it.time}</span>
+                </div>
+
+                {it.text ? <div>{it.text}</div> : null}
+
+                {/* вкладення: зображення */}
+                {it.attachments?.some(a => a.kind === "image") && (
+                  <div className="dm-att-grid">
+                    {it.attachments.filter(a => a.kind === "image").map(a => (
+                      <img key={a.id} className="dm-att-img" src={a.url} alt={a.name} />
+                    ))}
+                  </div>
+                )}
+
+                {/* вкладення: файли */}
+                {it.attachments?.some(a => a.kind === "file") && (
+                  <div className="dm-att-files">
+                    {it.attachments.filter(a => a.kind === "file").map(a => (
+                      <a key={a.id} href={a.url} download={a.name} className="dm-file-chip">
+                        📎 <span className="dm-file-name">{a.name}</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                {/* код-сніпет */}
+                {it.code?.content && (
+                  <div className="dm-code-block">
+                    {it.code.language && <div className="dm-code-tag">{it.code.language}</div>}
+                    <pre><code>{it.code.content}</code></pre>
+                  </div>
+                )}
+
+                {/* реакції тільки для не-mine і якщо є що показати */}
+                {!it.mine && (it.reactions?.thumbs || it.reactions?.ack) && (
+                  <div className="dm-reactions">
+                    {it.reactions?.thumbs ? <span>👍 {it.reactions.thumbs}</span> : null}
+                    {it.reactions?.ack ? <span>✅ {it.reactions.ack}</span> : null}
+                  </div>
+                )}
+              </div>
+
+              {it.mine && <div className="dm-avatar dm-me">U</div>}
+            </div>
+          )
+        )}
+      </div>
+
+      {showJump && (
+        <button className="dm-jump-latest" onClick={jumpToLatest}>
+          ↓ New messages
+        </button>
+      )}
+    </div>
   );
 }
