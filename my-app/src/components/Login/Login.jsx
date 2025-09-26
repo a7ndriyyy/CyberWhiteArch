@@ -33,6 +33,8 @@ export default function Login() {
 
       if (response.ok) {
         localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userId", data.userId);
+        localStorage.setItem("username", data.username);
         setResponseMsg("🟢 Login successful. Welcome to CyberCore.");
         setTimeout(() => {
            navigate("/app/welcome");

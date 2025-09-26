@@ -56,6 +56,8 @@ export default function Register() {
 
       if (response.ok) {
         alert('User registered successfully!');
+        localStorage.setItem("userId", data.userId);
+        localStorage.setItem("username", data.username);
         navigate('/login');
       } else {
         alert('Error: ' + data.msg);
