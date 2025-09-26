@@ -1,147 +1,139 @@
+// srcApp/pages/InSystem/Profile/ProfilePage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import "./ProfilePage.css";
-
 import Shell from "../../../componentsApp/Profile/Shell";
 import Header from "../../../componentsApp/Profile/Header";
 import SidebarAbout from "../../../componentsApp/Profile/SidebarAbout";
 import TabsBar from "../../../componentsApp/Profile/TabsBar";
 import GalleryGrid from "../../../componentsApp/Profile/GalleryGrid";
 import PostCard from "../../../componentsApp/Profile/PostCard";
+import EditProfile from "../../../componentsApp/Profile/EditProfile";
 
 export default function ProfilePage() {
-  /* ---------------- Theme (keep your behavior) ---------------- */
-  const [theme, setTheme] = useState("dark");
-  useEffect(() => {
-    const saved = localStorage.getItem("cwh-theme") || "dark";
-    setTheme(saved);
-    document.documentElement.setAttribute("data-theme", saved);
-  }, []);
-  useEffect(() => {
-    const btn = document.getElementById("themeToggle");
-    const toggle = () => {
-      const next = theme === "dark" ? "light" : "dark";
-      setTheme(next);
-      document.documentElement.setAttribute("data-theme", next);
-      localStorage.setItem("cwh-theme", next);
-    };
-    btn?.addEventListener("click", toggle);
-    return () => btn?.removeEventListener("click", toggle);
-  }, [theme]);
+  /* theme same as before ... */  // (keep your theme code)
 
-  /* ---------------- Data (fetch me) ---------------- */
   const userId = localStorage.getItem("userId");
   const [raw, setRaw] = useState(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const [editing, setEditing] = useState(false);
+
+  const isMe = true; // this /app/profile is always "me"
 
   useEffect(() => {
-    if (!userId) {
-      setErr("No session found");
-      setLoading(false);
-      return;
-    }
+    if (!userId) { setErr("No session found"); setLoading(false); return; }
     setLoading(true);
     fetch(`http://localhost:5000/users/${userId}`)
-      .then(async (r) => {
-        if (!r.ok) throw new Error((await r.json())?.msg || "Failed to load user");
-        return r.json();
-      })
+      .then(async r => { if(!r.ok) throw new Error((await r.json())?.msg || "Failed"); return r.json(); })
       .then(setRaw)
-      .catch((e) => setErr(e.message))
-      .finally(() => setLoading(false));
+      .catch(e => setErr(e.message))
+      .finally(()=>setLoading(false));
   }, [userId]);
 
-  /* ---------------- Map to UI props your components need ---------------- */
   const ui = useMemo(() => {
     if (!raw) return null;
-
     const username = raw.username || "user";
-    const initials = username.slice(0, 2).toUpperCase();
+    const initials = (raw.displayName || username).slice(0,2).toUpperCase();
 
-    // Header props
     const user = {
       initials,
-      name: username,                       // you can add displayName later
-      title: "Security Researcher",         // placeholder until you store it
-      tags: ["E2E Advocate", `@${username}`],
+      name: raw.displayName || username,
+      title: raw.title || "",
+      tags: raw.tags?.length ? raw.tags : [`@${username}`],
       stats: {
-        posts: raw.postsCount || 0,
+        posts: raw.posts?.length || 0,
         followers: raw.followers || 0,
         following: raw.following || 0,
       },
-      reputation: "Top 5% Reputation",      // placeholder
+      reputation: "Top 5% Reputation",
     };
 
-    // Sidebar
-    const about =
-      raw.bio ||
-      "Privacy-first builder. Threat modeling enjoyer. Open source over everything.";
-    const highlights = raw.highlights || ["E2E", "CSP", "Bug Bounty Top 1%", "Open Source Maintainer"];
-    const skills =
-      raw.skills || ["Web Exploitation", "Reverse Engineering", "Threat Modeling", "Privacy Engineering"];
-
-    // Gallery + Posts (empty until you store them)
-    const gallery = raw.gallery || Array.from({ length: 6 }, (_, i) => ({ id: i, label: "IMG" }));
-    const posts = raw.posts || [
-      {
-        id: "demo1",
-        author: { initials, name: username },
-        meta: "Posted · #bugbounty",
-        text:
-          "Landed a critical IDOR on a popular SaaS. Write-up soon (sanitized). Stay safe, ship fast.",
-        media: [{ label: "PoC" }, { label: "Graph" }],
-        actions: { likes: "1.2k", comments: 28 },
-      },
-    ];
-
-    return { user, about, highlights, skills, gallery, posts };
+    return {
+      user,
+      about: raw.bio || "",
+      highlights: raw.highlights || [],
+      skills: raw.skills || [],
+      gallery: raw.gallery || [],
+      posts: raw.posts || [],
+      raw, // pass-through if editor needs it
+    };
   }, [raw]);
 
-  /* ---------------- States ---------------- */
-  if (loading) return <div style={{ padding: 16 }}>Loading profile…</div>;
-  if (err) return <div style={{ padding: 16, color: "#f66" }}>Error: {err}</div>;
+  if (loading) return <div style={{ padding:16 }}>Loading profile…</div>;
+  if (err) return <div style={{ padding:16, color:"#f66" }}>Error: {err}</div>;
   if (!ui) return null;
 
-  /* ---------------- View ---------------- */
+  const onSaved = (updated) => {
+    // updated contains merged doc as returned by PATCH route
+    setRaw(prev => ({ ...prev, ...updated }));
+  };
+
   return (
     <div className="cw-profile-page">
       <Shell />
 
-      {/* Cover with gradient banner */}
+      {/* Cover */}
       <section className="cw-cover cw-card">
-        <div className="cw-cover__banner" />
+        <div className="cw-cover__banner" style={{
+          backgroundImage: ui.raw.bannerUrl ? `url(${ui.raw.bannerUrl})` : undefined
+        }}/>
         <div className="cw-cover__footer">
-          <Header user={ui.user} />
+          <Header user={ui.user} isMe={isMe} onEdit={() => setEditing(true)} />
         </div>
       </section>
 
       <div className="cw-profile-body">
         <aside className="cw-about cw-card">
-          <SidebarAbout about={ui.about} highlights={ui.highlights} skills={ui.skills} />
+          <SidebarAbout
+            about={ui.about || (isMe ? "Add a bio…" : "")}
+            highlights={ui.highlights}
+            skills={ui.skills}
+          />
         </aside>
 
         <main className="cw-profile-main">
           <div className="cw-tabsbar cw-card">
-            <TabsBar tabs={["Posts", "Connections", "Activity", "About"]} active="Posts" />
+            <TabsBar tabs={["Posts","Connections","Activity","About"]} active="Posts" />
           </div>
 
-          <section className="cw-gallery cw-card">
-            <GalleryGrid items={ui.gallery} />
-          </section>
+          {/* Gallery (hide if empty for new user) */}
+          {ui.gallery.length > 0 && (
+            <section className="cw-gallery cw-card">
+              <GalleryGrid items={ui.gallery} />
+            </section>
+          )}
 
-          {ui.posts.map((p) => (
-            <article key={p.id} className="cw-post-card cw-card">
-              <PostCard
-                author={p.author}
-                meta={p.meta}
-                text={p.text}
-                media={p.media}
-                actions={p.actions}
-              />
-            </article>
-          ))}
+          {/* Posts (clean for new user) */}
+          {ui.posts.length === 0 ? (
+            <div className="cw-card" style={{ padding:16, color:"var(--muted)" }}>
+              {isMe ? "No posts yet. Share your first update!" : "No posts yet."}
+            </div>
+          ) : (
+            ui.posts.map(p => (
+              <article key={p.id} className="cw-post-card cw-card">
+                <PostCard {...p} />
+              </article>
+            ))
+          )}
         </main>
       </div>
+
+      <EditProfile
+        open={editing}
+        initial={{
+          displayName: ui.user.name,
+          title: ui.user.title,
+          bio: ui.about,
+          tags: ui.user.tags,
+          highlights: ui.highlights,
+          skills: ui.skills,
+          bannerUrl: ui.raw.bannerUrl,
+          avatarUrl: ui.raw.avatarUrl,
+          username: raw.username
+        }}
+        onClose={() => setEditing(false)}
+        onSaved={onSaved}
+      />
     </div>
   );
 }

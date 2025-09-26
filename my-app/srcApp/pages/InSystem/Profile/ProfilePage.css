@@ -118,3 +118,34 @@
   background: var(--elev-2);
   border: 1px solid var(--stroke);
 }
+
+
+
+
+
+
+
+
+
+.ep-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.5);
+  display:grid; place-items:center; z-index:50;
+}
+.ep-sheet{
+  width:min(560px, 92vw);
+  background:var(--elev-1,#10171d);
+  border:1px solid var(--stroke,#1e2a33);
+  border-radius:12px; padding:16px; color:var(--text,#e6f1f5);
+}
+.ep-sheet h3{ margin:0 0 10px }
+.ep-sheet label{ display:block; font-size:13px; color:var(--muted,#8ea4b0); margin:12px 0 6px }
+.ep-sheet input, .ep-sheet textarea{
+  width:100%; border:1px solid var(--stroke,#1e2a33); border-radius:8px;
+  background:var(--elev-2,#121c22); color:var(--text,#e6f1f5); padding:8px 10px;
+}
+.ep-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:14px }
+.ep-btn{
+  background:var(--elev-2,#121c22); border:1px solid var(--stroke,#1e2a33);
+  color:var(--text,#e6f1f5); border-radius:8px; padding:8px 12px; cursor:pointer;
+}
+.ep-primary{ background:linear-gradient(180deg, var(--accent,#4bf2d7), var(--accent-2,#30e1c6)); color:#001110; border:none; }
