@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function TabsBar({ tabs = [], active, onChange }) {
   return (
@@ -16,7 +17,8 @@ export default function TabsBar({ tabs = [], active, onChange }) {
         ))}
       </div>
       <div className="cw-right-actions">
-        <button className="cw-chip">Edit</button>
+        
+         <Link to="edit" className="cw-chip">Edit</Link>
         <button className="cw-chip">Share</button>
       </div>
     </>

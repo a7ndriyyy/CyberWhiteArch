@@ -23,6 +23,7 @@ import HackerLoader from '../srcApp/componentsApp/HackerLoader/HackerLoader';
 import ProfilePage from '../srcApp/pages/InSystem/Profile/ProfilePage';
 import CommunityPage from '../srcApp/pages/InSystem/Community/CommunityPage';
 import DMPage from '../srcApp/pages/InSystem/DM/DMPage'; 
+import EditProfilePage from '../srcApp/pages/InSystem/EditProfilePage/EditProfilePage';
 
 // Контейнер для лоадера + редірект
 function WelcomePage() {
@@ -69,6 +70,7 @@ function App() {
 
     <Route path="welcome" element={<WelcomePage />} />
     <Route path="profile" element={<ProfilePage />} />
+    <Route path="profile/edit" element={<EditProfilePage />} />
     <Route path="community" element={<CommunityPage />} />
     <Route path="dm" element={<DMPage />} />
 
