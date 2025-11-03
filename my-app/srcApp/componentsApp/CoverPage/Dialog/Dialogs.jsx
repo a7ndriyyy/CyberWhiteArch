@@ -1,6 +1,7 @@
 // src/pages/CoverPage/components/Dialogs.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { NavLink, Link } from "react-router-dom";
 import "./Dialogs.css";
 
 const dialogsData = [
@@ -25,6 +26,10 @@ export default function Dialogs() {
   const username = user?.username || "Guest";
   const avatar = username.slice(0, 2).toUpperCase();
 
+  // Keep your "is-active" class in sync with current route
+  const linkClass = ({ isActive }) =>
+    `cw-sidenav__item ${isActive ? "is-active" : ""}`;
+
   return (
     <aside className="cw-dialogs">
       <div className="cw-dialogs__head">
@@ -35,46 +40,53 @@ export default function Dialogs() {
       </div>
 
       <nav className="cw-sidenav cw-card" aria-label="Primary">
-        <a className="cw-sidenav__item is-active" href="#">
+        {/* ABSOLUTE /app/... paths so you stay inside the protected app */}
+        <NavLink to="/app" end className={linkClass}>
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M3 11.5 12 4l9 7.5" />
             <path d="M5 10.5V20h14v-9.5" />
           </svg>
           Home
-        </a>
-        <a className="cw-sidenav__item" href="#">
+        </NavLink>
+
+        {/* These two require you to have routes at /app/explore and /app/create (optional) */}
+        <NavLink to="/app/explore" className={linkClass}>
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <circle cx="11" cy="11" r="7" />
             <path d="M20 20l-3.5-3.5" />
           </svg>
           Explore
-        </a>
-        <a className="cw-sidenav__item" href="#">
+        </NavLink>
+
+        <NavLink to="/app/dm" className={linkClass}>
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <rect x="3" y="5" width="18" height="14" rx="2" />
             <path d="M3 8h18" />
           </svg>
           Messages
-        </a>
-        <a className="cw-sidenav__item" href="#">
+        </NavLink>
+
+        <NavLink to="/app/community" className={linkClass}>
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
           </svg>
           Community
-        </a>
-        <a className="cw-sidenav__item" href="#">
+        </NavLink>
+
+        <NavLink to="/app/profile" className={linkClass}>
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Z" />
             <path d="M2 22a10 10 0 0 1 20 0" />
           </svg>
           Profile
-        </a>
-        <a className="cw-sidenav__item" href="#">
+        </NavLink>
+
+        <NavLink to="/app/create" className={linkClass}>
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M12 5v14M5 12h14" />
           </svg>
           Create Tool
-        </a>
+        </NavLink>
       </nav>
 
       <div className="cw-dialogs__card">
@@ -88,7 +100,7 @@ export default function Dialogs() {
 
         <div className="cw-dialogs__list">
           {dialogsData.map((d) => (
-            <a href="#" className="cw-dialogs__item" key={d.id}>
+            <Link to={`/app/dm?chat=${d.id}`} className="cw-dialogs__item" key={d.id}>
               <div className="cw-dialogs__avatar">{d.avatar}</div>
               <div className="cw-dialogs__meta">
                 <div className="cw-dialogs__line">
@@ -100,7 +112,7 @@ export default function Dialogs() {
                   {d.badge && <span className="cw-dialogs__badge">{d.badge}</span>}
                 </div>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>
