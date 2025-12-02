@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EditProfile from "../../../componentsApp/Profile/EditProfile"; // <-- your modal
+import "./EditProfilePage.css"; // optional, if you want to style the page
 
 export default function EditProfilePage() {
   const userId = localStorage.getItem("userId");

@@ -7,6 +7,21 @@
   padding: 14px;
 }
 
+.cw-shell-topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 12px; position:sticky; top:0; z-index:5;
+}
+.cw-topbar-actions { display:flex; gap:8px; }
+.cw-logo {
+  display:inline-grid; place-items:center;
+  width:28px; height:28px; border-radius:8px; font-weight:800;
+  background:linear-gradient(180deg,#7fffd4,#2bbda9); color:#001110; margin-right:8px;
+}
+
+
+
+
+
 /* top shell */
 .cw-shell { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--elev-1); }
 .cw-shell-left { display:flex; gap:10px; align-items:center; }
@@ -74,23 +89,19 @@
 
 
 /* ===== Cover (banner) ===== */
-
-.cw-cover {
-  padding: 0;               /* banner edge-to-edge inside the card */
-  overflow: hidden;
-}
-
+.cw-cover { position:relative; overflow:hidden; }
 .cw-cover__banner {
-  height: 170px;
-  /* Green → Blue gradient like your mock */
-  background: linear-gradient(90deg, #2fbe71 0%, #2f93c9 48%, #2e66f0 100%);
-  border-bottom: 1px solid var(--stroke);
+  height: 180px;
+  background: linear-gradient(90deg,#39e2b8,#3c8df5);
+  background-size: cover; background-position: center;
+  border-radius: 12px 12px 0 0;
 }
-
 .cw-cover__footer {
-  background: var(--elev-1);
-  padding: 16px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 10px 12px;
 }
+.cw-cover__edit { margin-left:auto; }
+
 
 /* Make avatar overlap the seam with a ring */
 .cw-cover .cw-avatar--lg {
@@ -122,7 +133,9 @@
 
 
 
-
+.cw-tabsbar { display:flex; align-items:center; justify-content:space-between; }
+.cw-tabs { display:flex; gap:8px; }
+.cw-right-actions { display:flex; gap:8px; }
 
 
 
@@ -149,3 +162,7 @@
   color:var(--text,#e6f1f5); border-radius:8px; padding:8px 12px; cursor:pointer;
 }
 .ep-primary{ background:linear-gradient(180deg, var(--accent,#4bf2d7), var(--accent-2,#30e1c6)); color:#001110; border:none; }
+
+.cw-profile-body { grid-template-columns: 320px minmax(0,1fr); }
+.cw-about, .cw-profile-main, .cw-card, .cw-post-card { min-width: 0; }
+.cw-bio, .cw-card { white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }

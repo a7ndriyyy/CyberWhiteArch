@@ -24,6 +24,7 @@ import ProfilePage from '../srcApp/pages/InSystem/Profile/ProfilePage';
 import CommunityPage from '../srcApp/pages/InSystem/Community/CommunityPage';
 import DMPage from '../srcApp/pages/InSystem/DM/DMPage'; 
 import EditProfilePage from '../srcApp/pages/InSystem/EditProfilePage/EditProfilePage';
+import Explore from '../srcApp/pages/InSystem/Explore/Explore';
 
 // Контейнер для лоадера + редірект
 function WelcomePage() {
@@ -69,6 +70,7 @@ function App() {
     <Route path="dashboard" element={<Navigate to="." replace />} />
 
     <Route path="welcome" element={<WelcomePage />} />
+    <Route path='explore' element={<Explore />} />
     <Route path="profile" element={<ProfilePage />} />
     <Route path="profile/edit" element={<EditProfilePage />} />
     <Route path="community" element={<CommunityPage />} />
