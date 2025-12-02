@@ -1,0 +1,37 @@
+/* ==== EditProfile.css (modal) ==== */
+.ep-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  display: grid; place-items: center;
+  z-index: 50;
+}
+
+.ep-sheet {
+  width: min(720px, 94vw);
+  max-height: 80vh;          /* ✅ scroll instead of overflow */
+  overflow: auto;
+  background: var(--elev-1,#10171d);
+  border: 1px solid var(--stroke,#1e2a33);
+  border-radius: 14px;
+  padding: 16px;
+  color: var(--text,#e6f1f5);
+  display: grid; gap: 10px;
+}
+
+.ep-sheet h3 { margin: 4px 0 6px; }
+
+.ep-sheet label { font-size: 12px; color: var(--muted,#8ea4b0); }
+.ep-sheet input, .ep-sheet textarea {
+  width: 100%;
+  background: var(--elev-2,#121c22); color: var(--text,#e6f1f5);
+  border: 1px solid var(--stroke,#1e2a33); border-radius: 10px; padding: 10px 12px;
+}
+
+.ep-sheet textarea {
+  resize: vertical; min-height: 120px; max-height: 360px;
+  overflow: auto; white-space: pre-wrap; word-break: break-word;
+}
+
+.ep-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+.ep-btn { background: var(--elev-2,#121c22); border: 1px solid var(--stroke,#1e2a33); color: var(--text,#e6f1f5); border-radius: 10px; padding: 10px 14px; }
+.ep-primary { background: linear-gradient(180deg, var(--accent,#4bf2d7), var(--accent-2,#30e1c6)); border: none; color: #001110; font-weight: 700; }
