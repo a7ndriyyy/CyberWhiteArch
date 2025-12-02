@@ -28,6 +28,8 @@ import Explore from '../srcApp/pages/InSystem/Explore/Explore';
 
 // e.g. createtoolmodal
 import CreateToolPage from '../srcApp/pages/CreateToolPage';
+import ToolsHubPage from '../srcApp/pages/InSystem/Tools/ToolsHubPage';
+import ToolDetailsPage from '../srcApp/pages/InSystem/Tools/ToolDetailsPage';
 
 // Контейнер для лоадера + редірект
 function WelcomePage() {
@@ -57,7 +59,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-        <Route path="tools" element={<Tools />} />
+        <Route path="documetation" element={<Tools />} />
         <Route path="community" element={<Community />} />
         <Route path="source-files" element={<SourceFiles />} />
         </Route>
@@ -78,8 +80,9 @@ function App() {
     <Route path="profile/edit" element={<EditProfilePage />} />
     <Route path="community" element={<CommunityPage />} />
     <Route path="dm" element={<DMPage />} />
-    <Route path="toolspage/new" element={<CreateToolPage />} />
-
+    <Route path="tools/new" element={<CreateToolPage />} />
+    <Route path='tools' element={<ToolsHubPage/>} />
+    <Route path='tools/:id' element={<ToolDetailsPage />} />
   </Route>
 </Route>
      

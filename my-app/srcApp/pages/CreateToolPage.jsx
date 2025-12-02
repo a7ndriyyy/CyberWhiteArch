@@ -1,50 +1,75 @@
-// src/pages/Tools/CreateToolPage.jsx
+// srcApp/pages/CreateToolPage.jsx
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./CreateToolPage.css";
 
 export default function CreateToolPage() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [tagline, setTagline] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("recon");
+  const [category, setCategory] = useState("Recon");
   const [tags, setTags] = useState("");
-  const [visibility, setVisibility] = useState("public");
+  const [visibility, setVisibility] = useState("Public");
+
   const [file, setFile] = useState(null);
+  const [filePreview, setFilePreview] = useState("");
+  const [fileName, setFileName] = useState("");
+
   const [agreeSafe, setAgreeSafe] = useState(false);
 
   const handleFileChange = (e) => {
     const f = e.target.files?.[0];
-    if (f) setFile(f);
+    if (!f) return;
+
+    setFile(f);
+    setFileName(f.name);
+
+    const ext = f.name.split(".").pop().toLowerCase();
+    const previewable = ["txt", "py", "js", "sh", "json", "md", "yaml", "yml"];
+
+    if (previewable.includes(ext)) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setFilePreview(ev.target.result);
+      };
+      reader.readAsText(f);
+    } else {
+      setFilePreview("// This file type cannot be previewed here.");
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!agreeSafe) {
-      alert("You must confirm the tool is not malware.");
+      alert("You must confirm the tool is not malware / backdoored.");
       return;
     }
 
-    // TODO: send data + file to backend
-    // const formData = new FormData();
-    // formData.append("name", name);
-    // formData.append("tagline", tagline);
-    // formData.append("description", description);
-    // formData.append("category", category);
-    // formData.append("tags", tags);
-    // formData.append("visibility", visibility);
-    // formData.append("file", file);
+    if (!name.trim()) {
+      alert("Please give your tool a name.");
+      return;
+    }
 
-    console.log("Create tool payload:", {
-      name,
-      tagline,
-      description,
+    const newTool = {
+      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+      name: name.trim(),
+      tagline: tagline.trim(),
+      description: description.trim(),
       category,
-      tags,
+      tags: tags.trim(),
       visibility,
-      file,
-    });
+      fileName: fileName || null,
+      filePreview: filePreview || "",
+    };
 
-    alert("Tool submitted! (Hook this up to your API)");
+    const existing = JSON.parse(localStorage.getItem("cw_tools") || "[]");
+    existing.push(newTool);
+    localStorage.setItem("cw_tools", JSON.stringify(existing));
+
+    navigate("/app/tools");
   };
 
   return (
@@ -53,13 +78,14 @@ export default function CreateToolPage() {
         <div>
           <h1 className="cw-ct-title">Create a new tool</h1>
           <p className="cw-ct-subtitle">
-            Publish safe offensive-security utilities for the community. All uploads are scanned by AV.
+            Upload a safe tool and let others inspect the script before downloading it.
           </p>
         </div>
 
+        {/* 🔴 RED WARNING PILL */}
         <div className="cw-ct-rule-pill">
           <span className="cw-ct-dot"></span>
-          No malware · No infected files · Permanent ban for abuse
+          No malware · No backdoor · Permanent ban for abuse
         </div>
       </header>
 
@@ -70,14 +96,12 @@ export default function CreateToolPage() {
 
           <form className="cw-ct-form" onSubmit={handleSubmit}>
             <div className="cw-ct-field">
-              <label className="cw-ct-label">
-                Tool name <span className="cw-ct-required">*</span>
-              </label>
+              <label className="cw-ct-label">Tool name *</label>
               <input
                 className="cw-ct-input"
-                placeholder="e.g. PortScanner Pro"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. PortScanner Pro"
                 required
               />
             </div>
@@ -86,22 +110,20 @@ export default function CreateToolPage() {
               <label className="cw-ct-label">Short tagline</label>
               <input
                 className="cw-ct-input"
-                placeholder="Quick TCP port scanner with banners"
                 value={tagline}
                 onChange={(e) => setTagline(e.target.value)}
+                placeholder="Fast TCP/UDP port scanner"
               />
             </div>
 
             <div className="cw-ct-field">
-              <label className="cw-ct-label">
-                Description <span className="cw-ct-required">*</span>
-              </label>
+              <label className="cw-ct-label">Description *</label>
               <textarea
                 className="cw-ct-textarea"
-                rows={6}
-                placeholder="Explain what the tool does, how to use it, and any requirements."
+                rows={5}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                placeholder="Explain what your tool does, how to use it, and any requirements."
                 required
               />
             </div>
@@ -114,11 +136,11 @@ export default function CreateToolPage() {
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 >
-                  <option value="recon">Recon / Discovery</option>
-                  <option value="analysis">Analysis / Forensics</option>
-                  <option value="exploitation">Exploitation helpers</option>
-                  <option value="post">Post-exploitation helpers</option>
-                  <option value="utility">Utility / Misc</option>
+                  <option>Recon</option>
+                  <option>Analysis</option>
+                  <option>Exploitation</option>
+                  <option>Post-exploitation</option>
+                  <option>Utility</option>
                 </select>
               </div>
 
@@ -129,9 +151,9 @@ export default function CreateToolPage() {
                   value={visibility}
                   onChange={(e) => setVisibility(e.target.value)}
                 >
-                  <option value="public">Public</option>
-                  <option value="unlisted">Unlisted</option>
-                  <option value="private">Private (only you)</option>
+                  <option>Public</option>
+                  <option>Unlisted</option>
+                  <option>Private</option>
                 </select>
               </div>
             </div>
@@ -140,11 +162,11 @@ export default function CreateToolPage() {
               <label className="cw-ct-label">Tags</label>
               <input
                 className="cw-ct-input"
-                placeholder="nmap, tcp, scanner"
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
+                placeholder="ports, tcp, scanner"
               />
-              <p className="cw-ct-hint">Comma-separated. Example: recon, http, dns</p>
+              <p className="cw-ct-hint">Comma separated. Example: recon, http, dns</p>
             </div>
 
             <div className="cw-ct-safe-row">
@@ -161,22 +183,26 @@ export default function CreateToolPage() {
             </div>
 
             <div className="cw-ct-actions">
-              <button type="button" className="cw-btn cw-btn--ghost">
+              <button
+                type="button"
+                className="cw-btn cw-btn--ghost"
+                onClick={() => navigate("/app/tools")}
+              >
                 Cancel
               </button>
               <button type="submit" className="cw-btn cw-btn--primary">
-                Submit tool
+                Save tool
               </button>
             </div>
           </form>
         </section>
 
-        {/* RIGHT: UPLOAD + PREVIEW */}
+        {/* RIGHT: FILE DROP + LIVE PREVIEW */}
         <aside className="cw-ct-sidebar">
           <div className="cw-card cw-ct-upload-card">
-            <h2 className="cw-ct-section-title">Upload & scan</h2>
+            <h2 className="cw-ct-section-title">Upload & AV notice</h2>
             <p className="cw-ct-text">
-              Upload your binary, script, or archive. We&apos;ll run it through our antivirus and security pipeline.
+              Drop your script or binary here. Files are subject to antivirus and security analysis.
             </p>
 
             <label className="cw-ct-dropzone">
@@ -188,10 +214,12 @@ export default function CreateToolPage() {
               <div className="cw-ct-dropzone-inner">
                 <div className="cw-ct-dropzone-icon">⬆</div>
                 <div className="cw-ct-dropzone-text">
-                  {file ? (
+                  {fileName ? (
                     <>
-                      <strong>{file.name}</strong>
-                      <span className="cw-ct-hint">Selected · will be scanned on submit</span>
+                      <strong>{fileName}</strong>
+                      <span className="cw-ct-hint">
+                        Selected · preview shown below if supported
+                      </span>
                     </>
                   ) : (
                     <>
@@ -204,39 +232,20 @@ export default function CreateToolPage() {
             </label>
 
             <ul className="cw-ct-list">
-              <li>Max size: 50 MB (example)</li>
-              <li>Allowed formats: zip, tar.gz, exe, bin, sh, py, etc. (adjust as you want)</li>
-              <li>Every upload is scanned before being visible to others.</li>
+              <li>No malware, no RATs, no loaders.</li>
+              <li>No intentionally infected files or backdoors.</li>
+              <li>Violations may result in a permanent ban.</li>
             </ul>
           </div>
 
           <div className="cw-card cw-ct-preview-card">
-            <h2 className="cw-ct-section-title">Preview</h2>
-            <div className="cw-ct-tool-preview">
-              <div className="cw-ct-tool-avatar">
-                {name ? name.slice(0, 2).toUpperCase() : "TL"}
-              </div>
-              <div className="cw-ct-tool-main">
-                <div className="cw-ct-tool-line">
-                  <strong>{name || "Your tool name"}</strong>
-                  <span className="cw-ct-pill">
-                    {category === "recon" && "Recon"}
-                    {category === "analysis" && "Analysis"}
-                    {category === "exploitation" && "Exploitation"}
-                    {category === "post" && "Post-exploitation"}
-                    {category === "utility" && "Utility"}
-                  </span>
-                </div>
-                <p className="cw-ct-tool-tagline">
-                  {tagline || "A short tagline for your tool will appear here."}
-                </p>
-                <p className="cw-ct-tool-description">
-                  {description
-                    ? description.slice(0, 160) + (description.length > 160 ? "…" : "")
-                    : "Once you write a description, a short preview of it will be shown to users here."}
-                </p>
-              </div>
-            </div>
+            <h2 className="cw-ct-section-title">Script preview</h2>
+            <pre className="tool-code-block">
+              <code>
+                {filePreview ||
+                  "// Paste a script or upload a previewable file to see it here."}
+              </code>
+            </pre>
           </div>
         </aside>
       </main>
