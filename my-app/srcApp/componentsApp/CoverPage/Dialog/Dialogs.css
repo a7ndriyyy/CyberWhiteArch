@@ -150,3 +150,31 @@
   border-radius: 999px; display: inline-grid; place-items: center;
   background: var(--accent-2); color: #001110; font-weight: 700; font-size: 12px;
 }
+
+.cw-sidenav__item--button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* BOLD "Create Tool" text */
+.cw-sidenav__item--bold {
+  font-weight: 700;
+}
+
+/* HOVER — match the exact color of your other nav item hovers */
+.cw-sidenav__item--button:hover {
+  color: #0ea5e9; /* hover text turns blue */
+}
+
+.cw-sidenav__item--button:hover .cw-sidenav__icon {
+  stroke: #0ea5e9; /* icon turns blue */
+}
