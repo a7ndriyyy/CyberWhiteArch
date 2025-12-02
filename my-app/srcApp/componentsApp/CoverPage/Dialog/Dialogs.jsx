@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Dialogs.css";
 import CreateToolModal from "../../CreateToolModal/CreateToolModal";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+
 
 const dialogsData = [
   { id: 1, avatar: "TG", title: "Core Devs", time: "14:22", lastMsg: "Yuki: Ship the thread prototype tonight?", badge: 3 },
@@ -39,40 +40,40 @@ export default function Dialogs() {
       </div>
 
       <nav className="cw-sidenav cw-card" aria-label="Primary">
-        <a className="cw-sidenav__item is-active" href="#">
+        <NavLink to="" className="cw-sidenav__item is-active">
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M3 11.5 12 4l9 7.5" />
             <path d="M5 10.5V20h14v-9.5" />
           </svg>
           Home
-        </a>
-        <a className="cw-sidenav__item" href="#">
+        </NavLink>
+        <NavLink to="explore" className="cw-sidenav__item">
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <circle cx="11" cy="11" r="7" />
             <path d="M20 20l-3.5-3.5" />
           </svg>
           Explore
-        </a>
-        <a className="cw-sidenav__item" href="#">
+        </NavLink>
+        <NavLink to="dm" className="cw-sidenav__item" href="#">
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <rect x="3" y="5" width="18" height="14" rx="2" />
             <path d="M3 8h18" />
           </svg>
           Messages
-        </a>
-        <a className="cw-sidenav__item" href="#">
+        </NavLink>
+        <NavLink to="community" className="cw-sidenav__item">
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
           </svg>
           Community
-        </a>
-        <a className="cw-sidenav__item" href="#">
+        </NavLink>
+        <NavLink to="profile" className="cw-sidenav__item">
           <svg viewBox="0 0 24 24" className="cw-sidenav__icon" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Z" />
             <path d="M2 22a10 10 0 0 1 20 0" />
           </svg>
           Profile
-        </a>
+        </NavLink>
         <button
         type="button"
         className="cw-sidenav__item cw-sidenav__item--button cw-sidenav__item--bold"
