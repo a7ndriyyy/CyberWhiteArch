@@ -27,7 +27,7 @@ export default function Header({ user }) {
         </div>
       </div>
 
-      <div className="cw-ph-actions">
+      {/* <div className="cw-ph-actions">
         <button className="cw-btn-primary">
           <svg className="cw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M12 5v14M5 12h14"/>
@@ -45,7 +45,7 @@ export default function Header({ user }) {
             <circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/>
           </svg>
         </button>
-      </div>
+      </div> */}
     </>
   );
 }

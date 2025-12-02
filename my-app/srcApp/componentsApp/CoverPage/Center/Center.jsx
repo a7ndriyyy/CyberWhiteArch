@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import "./Center.css";
+import { NavLink } from "react-router-dom";
 
 export default function Center() {
   const [user, setUser] = useState(null);
@@ -213,8 +214,9 @@ export default function Center() {
       <div className="cw-topbar cw-card">
         <div className="cw-tabs">
           <button className="cw-tab" aria-selected="true">Home</button>
-          <button className="cw-tab">Explore</button>
-          <button className="cw-tab">Following</button>
+          <NavLink to="explore" className="cw-tab-link">
+            <button className="cw-tab">Explore</button>
+            </NavLink>
         </div>
         <button className="cw-chip" onClick={toggleTheme} title="Toggle theme">
           <svg className="cw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
