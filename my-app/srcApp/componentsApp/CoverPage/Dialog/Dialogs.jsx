@@ -88,7 +88,7 @@ export default function Dialogs() {
           >
             <path d="M12 5v14M5 12h14" />
           </svg>
-          Create Tool
+          Explore the tools
         </button>
       </nav>
 
@@ -124,7 +124,7 @@ export default function Dialogs() {
       onClose={() => setIsCreateToolOpen(false)}
       onContinue={() => {
         setIsCreateToolOpen(false);
-        navigate("toolspage/new");
+        navigate("/app/tools");
       }}
       />
     </aside>

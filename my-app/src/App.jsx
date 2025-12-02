@@ -28,8 +28,8 @@ import Explore from '../srcApp/pages/InSystem/Explore/Explore';
 
 // e.g. createtoolmodal
 import CreateToolPage from '../srcApp/pages/CreateToolPage';
-import ToolsHubPage from '../srcApp/pages/InSystem/Tools/ToolsHubPage';
-import ToolDetailsPage from '../srcApp/pages/InSystem/Tools/ToolDetailsPage';
+import ToolsHubPage from '../srcApp/pages/InSystem/ToolsHub/ToolsHubPage'
+import ToolDetailsPage from '../srcApp/pages/InSystem/ToolsHub/ToolDetailsPage';
 
 // Контейнер для лоадера + редірект
 function WelcomePage() {

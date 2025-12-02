@@ -5,21 +5,23 @@ from flask_cors import CORS
 from pymongo import MongoClient, DESCENDING
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson import ObjectId
+from pathlib import Path
 from datetime import datetime
 import os
 
 # load .env if you need it (path is optional)
-load_dotenv('/my-app/src/backend/.env')
+env_path = Path(__file__).with_suffix('.env')
+load_dotenv(env_path)
 
 app = Flask(__name__)
 CORS(app)  # allows GET/POST/PATCH from your Vite dev server
 
 # --- Mongo setup ---
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
-DB_NAME = os.getenv("MONGO_DB", "cyberwhitehattest")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://100.123.33.82:27017/")
+DB_NAME = os.getenv("MONGO_DB", "Utilisateur")
 
 client = MongoClient(MONGO_URI)
-db = client['cyberwhitehattest']
+db = client[DB_NAME]
 users_collection = db['users']
 posts_collection = db['posts']
 conversations_collection = db['conversations']
