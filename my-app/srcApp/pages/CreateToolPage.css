@@ -1,0 +1,277 @@
+/* Layout */
+.cw-ct-layout {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: #e5e7eb;
+}
+
+.cw-ct-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.cw-ct-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.cw-ct-subtitle {
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+.cw-ct-rule-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: rgba(248, 113, 113, 0.06);
+  border: 1px solid rgba(248, 113, 113, 0.18);
+  color: #fecaca;
+  white-space: nowrap;
+}
+
+.cw-ct-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #f97373;
+}
+
+/* Main two-column layout */
+.cw-ct-main {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
+  gap: 18px;
+}
+
+.cw-ct-card {
+  padding: 18px 18px 20px;
+}
+
+.cw-ct-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Sections */
+.cw-ct-section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Form */
+.cw-ct-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cw-ct-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cw-ct-label {
+  font-size: 0.82rem;
+  color: #9ca3af;
+}
+
+.cw-ct-required {
+  color: #f97373;
+}
+
+.cw-ct-input,
+.cw-ct-textarea,
+.cw-ct-select {
+  background: #020617;
+  border-radius: 10px;
+  border: 1px solid #1f2937;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  color: #e5e7eb;
+  outline: none;
+}
+
+.cw-ct-input:focus,
+.cw-ct-textarea:focus,
+.cw-ct-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.4);
+}
+
+.cw-ct-textarea {
+  resize: vertical;
+}
+
+.cw-ct-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cw-ct-hint {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.cw-ct-safe-row {
+  margin-top: 4px;
+}
+
+.cw-ct-checkbox {
+  display: inline-flex;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #cbd5f5;
+  cursor: pointer;
+}
+
+.cw-ct-checkbox input {
+  margin-top: 1px;
+}
+
+/* Actions */
+.cw-ct-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Upload section */
+.cw-ct-upload-card {
+  padding: 16px 16px 18px;
+}
+
+.cw-ct-text {
+  font-size: 0.82rem;
+  color: #9ca3af;
+  margin-bottom: 12px;
+}
+
+.cw-ct-dropzone {
+  display: block;
+  border-radius: 14px;
+  border: 1px dashed #334155;
+  background: #020617;
+  padding: 14px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.cw-ct-dropzone-input {
+  display: none;
+}
+
+.cw-ct-dropzone-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cw-ct-dropzone-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.cw-ct-dropzone-text strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.cw-ct-list {
+  list-style: disc;
+  padding-left: 18px;
+  margin: 0;
+  font-size: 0.78rem;
+  color: #9ca3af;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Preview card */
+.cw-ct-preview-card {
+  padding: 16px;
+}
+
+.cw-ct-tool-preview {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.cw-ct-tool-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0f172a, #1f2937);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.cw-ct-tool-main {
+  flex: 1;
+}
+
+.cw-ct-tool-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.cw-ct-pill {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.15);
+  border: 1px solid rgba(37, 99, 235, 0.4);
+}
+
+.cw-ct-tool-tagline {
+  font-size: 0.8rem;
+  color: #cbd5f5;
+}
+
+.cw-ct-tool-description {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .cw-ct-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cw-ct-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cw-ct-rule-pill {
+    align-self: flex-start;
+  }
+}
