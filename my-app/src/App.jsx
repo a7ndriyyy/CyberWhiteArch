@@ -24,6 +24,9 @@ import ProfilePage from '../srcApp/pages/InSystem/Profile/ProfilePage';
 import CommunityPage from '../srcApp/pages/InSystem/Community/CommunityPage';
 import DMPage from '../srcApp/pages/InSystem/DM/DMPage'; 
 
+// e.g. createtoolmodal
+import CreateToolPage from '../srcApp/pages/CreateToolPage';
+
 // Контейнер для лоадера + редірект
 function WelcomePage() {
   const [view, setView] = useState('registered'); // "registered" | "loading"
@@ -71,6 +74,7 @@ function App() {
     <Route path="profile" element={<ProfilePage />} />
     <Route path="community" element={<CommunityPage />} />
     <Route path="dm" element={<DMPage />} />
+    <Route path="toolspage/new" element={<CreateToolPage />} />
 
   </Route>
 </Route>

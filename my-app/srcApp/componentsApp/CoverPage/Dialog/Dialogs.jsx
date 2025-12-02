@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Dialogs.css";
 import CreateToolModal from "../../CreateToolModal/CreateToolModal";
+import { useNavigate } from "react-router-dom";
 
 const dialogsData = [
   { id: 1, avatar: "TG", title: "Core Devs", time: "14:22", lastMsg: "Yuki: Ship the thread prototype tonight?", badge: 3 },
@@ -13,6 +14,7 @@ const dialogsData = [
 export default function Dialogs() {
   const [user, setUser] = useState(null);
   const [isCreateToolOpen, setIsCreateToolOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userId = localStorage.getItem("userId"); // saved at login
@@ -121,6 +123,7 @@ export default function Dialogs() {
       onClose={() => setIsCreateToolOpen(false)}
       onContinue={() => {
         setIsCreateToolOpen(false);
+        navigate("toolspage/new");
       }}
       />
     </aside>

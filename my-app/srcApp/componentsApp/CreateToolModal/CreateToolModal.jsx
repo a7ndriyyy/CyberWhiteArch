@@ -9,7 +9,7 @@ export default function CreateToolModal({ open, onClose, onContinue }) {
     <div className="cw-modal__backdrop" onClick={onClose}>
       <div
         className="cw-modal cw-card"
-        onClick={(e) => e.stopPropagation()} // don't close when clicking inside
+        onClick={(e) => e.stopPropagation()}
       >
         <h2 className="cw-modal__title">Before you create a tool</h2>
         <p className="cw-modal__text">
@@ -32,6 +32,8 @@ export default function CreateToolModal({ open, onClose, onContinue }) {
           >
             Cancel
           </button>
+
+          {/* 👇 THIS must call onContinue */}
           <button
             type="button"
             className="cw-btn cw-btn--primary"
