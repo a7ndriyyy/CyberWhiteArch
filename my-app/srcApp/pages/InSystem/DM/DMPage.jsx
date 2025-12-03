@@ -33,6 +33,10 @@ export default function DMPage() {
   const [chats, setChats] = useState([]);      // sidebar chats from backend
   const [messages, setMessages] = useState([]); // messages for active chat
 
+  const [addFriendOpen, setAddFriendOpen] = useState(false);
+  const [friendUsername, setFriendUsername] = useState("");
+  const [addingFriend, setAddingFriend] = useState(false);
+
   // ----- UI state -----
   const [panelOpen, setPanelOpen] = useState(true);
   const [panelQuery, setPanelQuery] = useState("");
@@ -123,7 +127,7 @@ export default function DMPage() {
           return {
             id: m.id,
             ts,
-            from: mine ? "ME" : (other?.initials || "U"),
+            from: mine ? "ME" : (other?.initials || "YOU"),
             author: mine ? "You" : (other?.name || m.fromUserId),
             time: new Date(m.createdAt).toLocaleTimeString([], {
               hour: "2-digit",
@@ -208,12 +212,77 @@ export default function DMPage() {
     }
   };
 
+    const onAddFriend = async () => {
+    const username = friendUsername.trim();
+    if (!username || !myUserId) return;
+
+    setAddingFriend(true);
+    try {
+      // 1) add friend on backend
+      const res = await fetch(`http://localhost:5000/users/${myUserId}/friends`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        console.error("Add friend failed:", data);
+        alert(data?.msg || "Failed to add friend");
+        return;
+      }
+
+      // 2) search to get friend userId + display data
+      const searchRes = await fetch(
+        `http://localhost:5000/users/search?q=${encodeURIComponent(username)}`
+      );
+      const searchData = await searchRes.json();
+      const match = (searchData.results || []).find(
+        (u) => u.username.toLowerCase() === username.toLowerCase()
+      );
+      if (!match) {
+        alert("Friend added but could not load profile info.");
+        return;
+      }
+
+      const friendId = match.userId;
+
+      // 3) update chats list
+      setChats((prev) => {
+        if (prev.some((c) => c.id === friendId)) return prev;
+        const now = new Date();
+        const newChat = {
+          id: friendId,
+          initials: match.initials,
+          name: match.displayName || match.username,
+          last: "Start secure chat",
+          time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          unread: 0,
+        };
+        return [newChat, ...prev];
+      });
+
+      // 4) open DM with that friend
+      setActiveChatId(friendId);
+
+      setAddFriendOpen(false);
+      setFriendUsername("");
+    } catch (err) {
+      console.error("Add friend error:", err);
+      alert("Failed to add friend");
+    } finally {
+      setAddingFriend(false);
+    }
+  };
+
+
   // handy refs for header
   const activeChat =
     chats.find((c) => c.id === activeChatId) || { name: "Chat", initials: "U" };
 
   return (
     <div className={`dm-layout ${panelOpen ? "is-panel-open" : ""}`}>
+
+      {/* LEFT COLUMN: chats list */}
       <DmChatPanel
         open={panelOpen}
         query={panelQuery}
@@ -223,9 +292,12 @@ export default function DMPage() {
         onSelect={(id) => {
           setActiveChatId(id); // messages will be loaded by useEffect
         }}
+         onAddFriend={() => setAddFriendOpen(true)} 
       />
 
+     
       <div className="dm-page">
+
         <DmHeader
           name={activeChat.name}
           initials={activeChat.initials}
@@ -243,6 +315,15 @@ export default function DMPage() {
 
         <div className="dm-body cw-card">
           <DmList messages={messages} />
+          {messages.length === 0 && (
+  <div className="dm-empty">
+    <p>No messages yet.</p>
+    <p className="dm-empty-sub">
+      Use “+ Find / add friend” to start a secure chat.
+    </p>
+  </div>
+)}
+
           <DmComposer
             vanishOn={vanish.on}
             vanishText={vanishText}
@@ -250,6 +331,44 @@ export default function DMPage() {
           />
         </div>
       </div>
+
+      {/* MODAL stays outside grid but inside dm-layout */}
+      {addFriendOpen && (
+        <div className="dm-modal-backdrop">
+          <div className="dm-modal">
+            <h3>Add friend</h3>
+            <p className="dm-modal-sub">
+              Type your friend's username exactly as they use it to login.
+            </p>
+            <input
+              className="dm-input-text"
+              placeholder="username (without @)"
+              value={friendUsername}
+              onChange={(e) => setFriendUsername(e.target.value)}
+            />
+            <div className="dm-modal-actions">
+              <button
+                className="dm-btn"
+                type="button"
+                onClick={() => {
+                  setAddFriendOpen(false);
+                  setFriendUsername("");
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="dm-btn dm-btn-primary"
+                type="button"
+                disabled={addingFriend || !friendUsername.trim()}
+                onClick={onAddFriend}
+              >
+                {addingFriend ? "Adding…" : "Add & open chat"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

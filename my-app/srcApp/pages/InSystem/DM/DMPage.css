@@ -15,21 +15,68 @@
 
 /* ====== CHAT LIST (panel — column 1) ====== */
 .dm-panel{
-  width:100%;                               /* follow track width (0 or 280) */
+  width:100%;
   position:sticky; top:14px; height:calc(100vh - 28px);
   overflow:auto;
-  display:grid; grid-template-rows:auto 1fr; gap:10px; padding:10px;
+  display:grid;
+  grid-template-rows: auto 1fr auto;   /* 👈 search | list | footer */
+  gap:10px;
+  padding:10px;
 
   border-right:1px solid var(--stroke);
   border-top-right-radius:0;
   border-bottom-right-radius:0;
 
-  /* hide interaction when collapsed */
   visibility:hidden; pointer-events:none;
 }
 .dm-layout.is-panel-open .dm-panel{
   visibility:visible; pointer-events:auto;
 }
+.dm-panel.cw-card{ box-shadow:none; }
+
+.dm-panel-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+/* empty state in panel */
+.dm-panel-empty{
+  margin-top:12px;
+  padding:8px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+.dm-panel-empty-sub{
+  margin-top:2px;
+  font-size:12px;
+}
+
+/* footer at bottom of sidebar */
+.dm-panel-footer{
+  padding-top:8px;
+}
+
+/* reuse add-friend button but make it full width in sidebar */
+.dm-addfriend-btn {
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: var(--elev-1);
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.dm-addfriend-btn--full {
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+}
+.dm-addfriend-btn:hover {
+  background: var(--elev-2);
+}
+
 .dm-panel.cw-card{ box-shadow:none; }
 
 .dm-panel-search{
@@ -339,6 +386,104 @@
 /* щоб падінг під композер рахувався і в код-режимі */
 .dm-scroll-inner{
   padding-bottom: calc(var(--composer-h, 76px) + 12px);
+}
+
+
+.dm-topbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px 0 8px;
+  gap: 8px;
+}
+
+.dm-addfriend-btn {
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: var(--elev-1);
+  padding: 4px 10px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.dm-addfriend-btn:hover {
+  background: var(--elev-2);
+}
+
+/* Modal */
+.dm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+}
+
+.dm-modal {
+  width: min(380px, 92vw);
+  background: var(--elev-1);
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--text);
+}
+
+.dm-modal h3 {
+  margin: 0 0 6px;
+}
+
+.dm-modal-sub {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.dm-input-text {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--stroke);
+  padding: 8px 10px;
+  background: var(--elev-2);
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.dm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.dm-btn {
+  border-radius: 8px;
+  border: 1px solid var(--stroke);
+  background: var(--elev-2);
+  padding: 6px 12px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+.dm-btn-primary {
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  color: #001110;
+  border: none;
+}
+.dm-btn[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.dm-empty {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--muted);
+  padding: 24px;
+}
+
+.dm-empty-sub {
+  margin-top: 4px;
+  font-size: 13px;
 }
 
 
