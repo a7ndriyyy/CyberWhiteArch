@@ -2,38 +2,53 @@ import React, { useMemo } from "react";
 
 export default function DmChatPanel({
   open,
-  query, setQuery,
+  query,
+  setQuery,
   chats = [],
   activeId,
   onSelect,
+  onAddFriend,
 }) {
   const q = query.trim().toLowerCase();
   const filtered = useMemo(
-    () => chats.filter(c =>
-      c.name.toLowerCase().includes(q) ||
-      (c.last || "").toLowerCase().includes(q)
-    ),
+    () =>
+      chats.filter(
+        (c) =>
+          c.name.toLowerCase().includes(q) ||
+          (c.last || "").toLowerCase().includes(q)
+      ),
     [chats, q]
   );
 
   return (
     <aside className={`dm-panel cw-card ${open ? "is-open" : ""}`}>
+      {/* search */}
       <div className="dm-panel-search">
-        <svg viewBox="0 0 24 24" className="cw-icon" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+        <svg
+          viewBox="0 0 24 24"
+          className="cw-icon"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="M20 20l-3.5-3.5" />
         </svg>
         <input
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder="Search users or chats"
         />
       </div>
 
+      {/* chat list */}
       <div className="dm-panel-list scroller">
-        {filtered.map(c => (
+        {filtered.map((c) => (
           <button
             key={c.id}
-            className={`dm-panel-item ${activeId === c.id ? "is-active" : ""}`}
+            className={`dm-panel-item ${
+              activeId === c.id ? "is-active" : ""
+            }`}
             onClick={() => onSelect(c.id)}
             title={c.name}
           >
@@ -50,6 +65,17 @@ export default function DmChatPanel({
             {c.unread ? <span className="dm-unread">{c.unread}</span> : null}
           </button>
         ))}
+      </div>
+
+      {/* footer row with add-friend button */}
+      <div className="dm-panel-footer">
+        <button
+          className="dm-addfriend-btn dm-addfriend-btn--full"
+          type="button"
+          onClick={onAddFriend}
+        >
+          + Find / add friend
+        </button>
       </div>
     </aside>
   );
