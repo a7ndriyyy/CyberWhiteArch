@@ -4,10 +4,12 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 import motor.motor_asyncio
+from typing import List, Optional
+import re
 
 # --- MongoDB setup ---
 DATABASE_URI = "mongodb://100.123.33.82:27017"
-DB_NAME = "chatdb"
+DB_NAME = "Chatdb"
 
 client = motor.motor_asyncio.AsyncIOMotorClient(DATABASE_URI)
 db = client[DB_NAME]
@@ -28,6 +30,7 @@ class User(BaseModel):
     username: str
     displayName: str
     initials: str
+    friends: List[str] = []
 
 class Message(BaseModel):
     fromUserId: str
@@ -35,6 +38,33 @@ class Message(BaseModel):
     text: str
     code: Optional[str] = None
     createdAt: Optional[datetime] = None
+
+class FriendRequest(BaseModel):
+    friendUsername: str
+
+# --- Create default users on startup ---
+@app.on_event("startup")
+async def create_default_users():
+    default_users = [
+        {
+            "username": "Root",
+            "displayName": "Root",
+            "initials": "RT",
+        },
+        {
+            "username": "roottest",
+            "displayName": "RootTest",
+            "initials": "RT",
+        },
+    ]
+
+    for user in default_users:
+        existing = await db.users.find_one({"username": user["username"]})
+        if not existing:
+            await db.users.insert_one(user)
+            print(f"Created default user: {user['username']}")
+        else:
+            print(f"Default user already exists: {user['username']}")
 
 # --- Routes ---
 
@@ -48,6 +78,7 @@ async def register_user(user: User):
         "username": user.username,
         "displayName": user.displayName,
         "initials": user.initials,
+        "friends": [],
     }
     result = await db.users.insert_one(doc)
     return {"id": str(result.inserted_id), "user": doc}
@@ -109,3 +140,60 @@ async def send_message(msg: Message):
     result = await db.messages.insert_one(doc)
     doc["_id"] = str(result.inserted_id)
     return {"message": doc}
+
+@app.get("/users/search")
+async def search_users(q: str = ""):
+    """
+    Search users ny username prefix: /users/search?q=roo
+    """
+    q = q.strip()
+    if not q:
+        return {"results": []}
+    
+    regex = re.compile(f"^{re.escape(q)}", re.IGNORECASE)
+    cursor = db.users.find({"username": {"$regex": regex}})
+
+    results = []
+    async for u in cursor:
+        username = u.get("username")
+        display = u.get("displayName", username)
+        initials = u.get("initials", (display[:2] or "U").upper())
+        results.append({
+            "username": username,
+            "displayName": display,
+            "initials": initials,
+        })
+    return {"results": results}
+
+@app.post("/users/{username}/friends")
+async def add_friend(username: str, req: FriendRequest):
+    """
+    Add a friend by username.
+    Body: { "friendUserame": "roottest" }
+    """
+    me = await db.users.find_one({"username": username})
+    if not me:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    friend = await db.users.find_one({"username": req.friendUsername})
+    if not friend:
+        raise HTTPException(status_code=404, detail="Friend not found")
+
+    if friend["username"] == username:
+        raise HTTPException(status_code=400, detail="Cannot add yourself")
+
+    await db.users.update_one(
+        {"username": username},
+        {"$addToSet": {"friends": friend["username"]}}
+    )
+
+    await db.users.update_one(
+        {"username": friend["username"]},
+        {"$addToSet": {"friends": username}}
+    )
+
+    return {
+        "msg": "friend added",
+        "me": username,
+        "friend": friend["username"],
+    }
