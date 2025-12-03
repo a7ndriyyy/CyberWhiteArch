@@ -36,7 +36,9 @@ export default function Dialogs() {
         {/* avatar initials from username */}
         <div className="cw-dialogs__logo">{avatar}</div>
         {/* username from Mongo */}
+        <NavLink to="profile">
         <div className="cw-dialogs__brand">@{username}</div>
+        </NavLink>
       </div>
 
       <nav className="cw-sidenav cw-card" aria-label="Primary">
