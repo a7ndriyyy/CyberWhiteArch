@@ -1,142 +1,185 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 from datetime import datetime
-from flask import  request, jsonify
-from bson import ObjectId
+from time import time
 
+app = Flask(__name__)
+CORS(app)
 
-def serialize_post(post):
-    created = post.get('createdAt')
-    if isinstance(created, datetime):
-        created_str = created.isoformat() + 'Z'
-    else:
-        created_str = str(created)
+# Mongo connection
+client = MongoClient("mongodb://100.123.33.82:27017/")
+db = client["Utilisateur"]
+posts_col = db["posts"]
+users_col = db["users"]   # if you have a users collection
 
+def serialize_comment(c):
     return {
-        'id': str(post.get('id') or post.get('_id')),
-        'userId': str(post.get('userId')) if post.get('userId') else None,
-        'handle': post.get('handle', '@anon'),
-        'text': post.get('text', ''),
-        'tags': post.get('tags', []),
-        'risk': post.get('risk', 'Low'),
-        'createdAt': created_str,
-        'likes': post.get('likes', 0),
-        'comments': post.get('comments', 0),
+        "id": str(c.get("_id")),
+        "userId": c.get("userId"),
+        "author": c.get("author", "Unknown"),
+        "text": c.get("text"),
+        "image": c.get("image"),
+        "time": c.get("createdAt", datetime.utcnow()).isoformat(),
     }
 
-@app.route('/users/<user_id>/posts', methods=['POST'])
-def create_post(user_id):
-    # validate user
-    try:
-        oid = ObjectId(user_id)
-    except Exception:
-        return jsonify({'msg': 'Invalid user id'}), 400
-
-    user = users_collection.find_one({'_id': oid})
-    if not user:
-        return jsonify({'msg': 'User not found'}), 404
-
-    body = request.json or {}
-    text = (body.get('text') or '').strip()
-    media = body.get('media') or []      # optional list of URLs
-    tags = body.get('tags') or []        # optional list or string
-    risk = body.get('risk') or 'Low'     # optional risk flag
-
-    if isinstance(tags, str):
-        # split by spaces/commas into array
-        tags = [t.strip() for t in tags.replace(',', ' ').split() if t.strip()]
-
-    if not text and not media:
-        return jsonify({'msg': 'Post must have text or media'}), 400
-
-    # object stored inside the USER document (keeps your current behavior)
-    user_post = {
-        'id': str(ObjectId()),
-        'text': text,
-        'media': media,
-        'tags': tags,
-        'risk': risk,
-        'createdAt': datetime.utcnow().isoformat() + 'Z',
-        'likes': 0,
-        'comments': 0
+def serialize_post(p):
+    comments = p.get("comments", [])
+    return {
+        "id": str(p["_id"]),
+        "userId": p.get("userId"),
+        "author": p.get("author", "Unknown"),
+        "initials": p.get("author", "?")[:2].upper(),
+        "text": p.get("text"),
+        "image": p.get("image"),
+        "audience": p.get("audience", "public"),
+        "allowVotes": p.get("allowVotes", False),
+        "score": p.get("score", 0),
+        "myVote": 0,  # client side only for now
+        "time": p.get("createdAt", datetime.utcnow()).isoformat(),
+        "reposts": p.get("reposts", 0),
+        "reaction": p.get("reaction"),
+        "comments": [serialize_comment(c) for c in comments[::-1]],
     }
 
-    # separate document for the global posts collection (used by Explore)
+# --------- ROUTES ---------
+
+@app.get("/posts")
+def get_posts():
+    posts = list(posts_col.find().sort("createdAt", -1))
+    return jsonify([serialize_post(p) for p in posts])
+
+@app.post("/posts")
+def create_post():
+    data = request.get_json() or {}
+    user_id = data.get("userId")
+    text = data.get("text")
+    image = data.get("image")
+    audience = data.get("audience", "public")
+    allow_votes = data.get("allowVotes", False)
+
+    if not user_id:
+      return jsonify({"error": "userId required"}), 400
+
+    # Optional: look up username by userId
+    username = "Guest"
+    if ObjectId.is_valid(user_id):
+        user = users_col.find_one({"_id": ObjectId(user_id)})
+        if user:
+            username = user.get("username", "Guest")
+
     post_doc = {
-        'userId': oid,
-        'handle': user.get('username', '@anon'),
-        'text': text,
-        'media': media,
-        'tags': tags,
-        'risk': risk,
-        'createdAt': datetime.utcnow(),  # real datetime for sorting in Mongo
-        'likes': 0,
-        'comments': 0
+        "userId": user_id,
+        "author": username,
+        "text": text,
+        "image": image,
+        "audience": audience,
+        "allowVotes": bool(allow_votes),
+        "score": 0,
+        "reposts": 0,
+        "reaction": None,
+        "createdAt": datetime.utcnow(),
+        "comments": [],
     }
 
-    # push into user's posts (your old behavior)
-    users_collection.update_one(
-        {'_id': oid},
-        {'$push': {'posts': {'$each': [user_post], '$position': 0}}}
+    res = posts_col.insert_one(post_doc)
+    post_doc["_id"] = res.inserted_id
+    return jsonify(serialize_post(post_doc)), 201
+
+@app.post("/posts/<post_id>/repost")
+def repost_post(post_id):
+    data = request.get_json() or {}
+    user_id = data.get("userId")
+
+    if not user_id:
+        return jsonify({"error": "userId required"}), 400
+
+    # --- find original post by its Mongo _id ---
+    if not ObjectId.is_valid(post_id):
+        return jsonify({"error": "invalid post id"}), 400
+
+    original = posts_col.find_one({"_id": ObjectId(post_id)})
+    if not original:
+        return jsonify({"error": "post not found"}), 404
+
+    # --- username of the user who is reposting ---
+    username = "Guest"
+    if ObjectId.is_valid(user_id):
+        user = users_col.find_one({"_id": ObjectId(user_id)})
+        if user:
+            username = user.get("username", "Guest")
+
+    # --- increment reposts counter on original ---
+    posts_col.update_one(
+        {"_id": original["_id"]},
+        {"$inc": {"reposts": 1}}
     )
 
-    # insert into global posts collection
-    posts_collection.insert_one(post_doc)
+    # --- create a new post as the repost ---
+    new_post_doc = {
+        "userId": user_id,
+        "author": username,
+        "text": original.get("text"),
+        "image": original.get("image"),
+        "audience": original.get("audience", "public"),
+        "allowVotes": original.get("allowVotes", False),
+        "score": 0,
+        "reposts": 0,
+        "reaction": None,
+        "createdAt": datetime.utcnow(),
+        "comments": [],
+        "repostOf": str(original["_id"]),  # link to original
+    }
 
-    # return updated user
-    user = users_collection.find_one({'_id': oid})
-    return jsonify(serialize_user(user)), 201
+    res = posts_col.insert_one(new_post_doc)
+    new_post_doc["_id"] = res.inserted_id
 
-    users_collection.update_one({'_id': oid}, {'$push': {'posts': {'$each':[post], '$position':0}}})
-    user = users_collection.find_one({'_id': oid})
-    return jsonify(serialize_user(user)), 201
-@app.route('/explore', methods=['GET'])
-def explore():
-    """
-    Returns posts + trending tags for the Explore page.
-    Query params:
-      - filter = trending | latest | critical
-      - q      = search text
-    """
-    filter_type = request.args.get('filter', 'trending')
-    q = (request.args.get('q') or '').strip()
-    limit = int(request.args.get('limit', 30))
+    # re-use your existing serializer
+    return jsonify(serialize_post(new_post_doc)), 201
 
-    mongo_query = {}
+@app.post("/posts/<post_id>/comments")
+def add_comment(post_id):
+    data = request.get_json() or {}
+    user_id = data.get("userId")
+    text = data.get("text")
+    image = data.get("image")
 
-    # search by text / tags
-    if q:
-        mongo_query["$or"] = [
-            {"text": {"$regex": q, "$options": "i"}},
-            {"tags": {"$regex": q, "$options": "i"}},
-        ]
+    if not user_id:
+        return jsonify({"error": "userId required"}), 400
 
-    # only critical
-    if filter_type == 'critical':
-        mongo_query["risk"] = "Critical"
+    # --- find post by Mongo _id ---
+    if not ObjectId.is_valid(post_id):
+        return jsonify({"error": "invalid post id"}), 400
 
-    # latest posts
-    cursor = (
-        posts_collection
-        .find(mongo_query)
-        .sort("createdAt", DESCENDING)
-        .limit(limit)
+    post = posts_col.find_one({"_id": ObjectId(post_id)})
+    if not post:
+        return jsonify({"error": "post not found"}), 404
+
+    # --- username of commenter ---
+    username = "Guest"
+    if ObjectId.is_valid(user_id):
+        user = users_col.find_one({"_id": ObjectId(user_id)})
+        if user:
+            username = user.get("username", "Guest")
+
+    comment_doc = {
+        "_id": ObjectId(),
+        "userId": user_id,
+        "author": username,
+        "text": text,
+        "image": image,
+        "createdAt": datetime.utcnow(),
+    }
+
+    posts_col.update_one(
+        {"_id": post["_id"]},
+        {"$push": {"comments": comment_doc}}
     )
-    posts = [serialize_post(p) for p in cursor]
 
-    # trending tags
-    pipeline = [
-        {"$unwind": "$tags"},
-        {"$match": mongo_query if q else {}},
-        {"$group": {"_id": "$tags", "count": {"$sum": 1}}},
-        {"$sort": {"count": -1}},
-        {"$limit": 10},
-    ]
-    tag_cursor = posts_collection.aggregate(pipeline)
-    trending = [
-        {"tag": d["_id"], "count": d["count"], "volume": f"{d['count']} posts"}
-        for d in tag_cursor
-    ]
+    return jsonify(serialize_comment(comment_doc)), 201
 
-    return jsonify({
-        "posts": posts,
-        "trending": trending
-    }), 200
+
+if __name__ == "__main__":
+    # important: run on the same port the React code uses
+    app.run(host="0.0.0.0", port=8002, debug=True)
