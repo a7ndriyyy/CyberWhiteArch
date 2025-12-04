@@ -76,11 +76,6 @@ export default function DmComposer({
   };
 
 
-
-
-
-
-
   const onDrop = (e) => {
     e.preventDefault();
     addFiles(e.dataTransfer.files);

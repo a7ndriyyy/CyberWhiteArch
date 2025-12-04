@@ -6,7 +6,7 @@ from datetime import datetime,timedelta
 import motor.motor_asyncio
 import re
 from bson import ObjectId 
-
+from pydantic import BaseModel
 
 
 
@@ -61,7 +61,16 @@ class FriendRequestRespond(BaseModel):
 class TypingPayload(BaseModel):
     fromUser: str
     toUser: str
-    isTyping: bool    
+    isTyping: bool   
+
+class FriendInvite(BaseModel):
+    fromUser: str
+    toUser: str     
+
+class FriendRespond(BaseModel):
+    toUser: str     # the one responding (current user)
+    fromUser: str   # the one who sent the request
+    accept: bool    
 
 
 # --- Create default users on startup (optional) ---
@@ -72,11 +81,17 @@ async def create_default_users():
             "username": "Root",
             "displayName": "Root",
             "initials": "RT",
+             "friends": [],
+            "incomingRequests": [],
+            "outgoingRequests": [],
         },
         {
             "username": "roottest",
             "displayName": "RootTest",
             "initials": "RT",
+             "friends": [],
+            "incomingRequests": [],
+            "outgoingRequests": [],
         },
     ]
 
@@ -86,6 +101,13 @@ async def create_default_users():
             await db.users.insert_one(user)
             print(f"Created default user: {user['username']}")
         else:
+            # optional: backfill missing fields
+            update = {}
+            for key in ["friends", "incomingRequests", "outgoingRequests"]:
+                if key not in existing:
+                    update[key] = []
+            if update:
+                await db.users.update_one({"_id": existing["_id"]}, {"$set": update})
             print(f"Default user already exists: {user['username']}")
 
 
@@ -106,6 +128,8 @@ async def register_user(user: User):
         "displayName": user.displayName,
         "initials": user.initials,
         "friends": [],
+        "incomingRequests": [],
+        "outgoingRequests": [],
     }
     result = await db.users.insert_one(doc)
     return {"id": str(result.inserted_id), "user": doc}
@@ -325,30 +349,180 @@ async def create_friend_request(from_username: str, payload: FriendRequestCreate
 
 
 
+@app.get("/users/{username}/friends")
+async def list_friends(username: str):
+    me = await db.users.find_one({"username": username})
+    if not me:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    friend_usernames = me.get("friends", [])
+    if not friend_usernames:
+        return {"friends": []}
+
+    cursor = db.users.find({"username": {"$in": friend_usernames}})
+    friends = []
+    async for u in cursor:
+        uname = u.get("username")
+        display = u.get("displayName") or uname
+        initials = u.get("initials") or (display[:2] or "U").upper()
+        friends.append(
+            {
+                "username": uname,
+                "displayName": display,
+                "initials": initials,
+            }
+        )
+    return {"friends": friends}
+
+
+
+@app.post("/friends/request")
+async def send_friend_request(inv: FriendInvite):
+    if inv.fromUser == inv.toUser:
+        raise HTTPException(status_code=400, detail="Cannot add yourself")
+
+    me = await db.users.find_one({"username": inv.fromUser})
+    them = await db.users.find_one({"username": inv.toUser})
+
+    if not me or not them:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    me_friends = me.get("friends", [])
+    if inv.toUser in me_friends:
+        raise HTTPException(status_code=400, detail="Already friends")
+
+    me_out = me.get("outgoingRequests", [])
+    them_in = them.get("incomingRequests", [])
+
+    if inv.toUser in me_out:
+        raise HTTPException(status_code=400, detail="Request already sent")
+
+    if inv.fromUser in them_in:
+        raise HTTPException(status_code=400, detail="Request already pending")
+
+    # add to outgoing / incoming
+    await db.users.update_one(
+        {"username": inv.fromUser},
+        {"$addToSet": {"outgoingRequests": inv.toUser}},
+    )
+    await db.users.update_one(
+        {"username": inv.toUser},
+        {"$addToSet": {"incomingRequests": inv.fromUser}},
+    )
+
+    return {"msg": "request sent"}
+
+
+
 @app.get("/friends/requests/{username}")
-async def list_friend_requests(username: str):
-    incoming = []
-    outgoing = []
+async def get_friend_requests(username: str):
+    me = await db.users.find_one({"username": username})
+    if not me:
+        raise HTTPException(status_code=404, detail="User not found")
 
-    async for fr in friend_requests.find({"to": username}).sort("createdAt", -1):
-        incoming.append({
-            "id": str(fr["_id"]),
-            "from": fr["from"],
-            "to": fr["to"],
-            "status": fr.get("status", "pending"),
-            "createdAt": fr["createdAt"].isoformat() + "Z",
-        })
+    incoming_names = me.get("incomingRequests", [])
+    outgoing_names = me.get("outgoingRequests", [])
 
-    async for fr in friend_requests.find({"from": username}).sort("createdAt", -1):
-        outgoing.append({
-            "id": str(fr["_id"]),
-            "from": fr["from"],
-            "to": fr["to"],
-            "status": fr.get("status", "pending"),
-            "createdAt": fr["createdAt"].isoformat() + "Z",
-        })
+    # helper to expand usernames to profile info
+    async def expand(names):
+        if not names:
+            return []
+        cursor = db.users.find({"username": {"$in": names}})
+        res = []
+        async for u in cursor:
+            uname = u.get("username")
+            display = u.get("displayName") or uname
+            initials = u.get("initials") or (display[:2] or "U").upper()
+            res.append(
+                {
+                    "username": uname,
+                    "displayName": display,
+                    "initials": initials,
+                }
+            )
+        # keep same order as original arrays
+        order = {n: i for i, n in enumerate(names)}
+        res.sort(key=lambda x: order.get(x["username"], 999))
+        return res
+
+    incoming = await expand(incoming_names)
+    outgoing = await expand(outgoing_names)
 
     return {"incoming": incoming, "outgoing": outgoing}
+
+@app.post("/friends/respond")
+async def respond_friend_request(body: FriendRespond):
+    if body.toUser == body.fromUser:
+        raise HTTPException(status_code=400, detail="Invalid request")
+
+    me = await db.users.find_one({"username": body.toUser})
+    them = await db.users.find_one({"username": body.fromUser})
+
+    if not me or not them:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # remove from pending
+    await db.users.update_one(
+        {"username": body.toUser},
+        {"$pull": {"incomingRequests": body.fromUser}},
+    )
+    await db.users.update_one(
+        {"username": body.fromUser},
+        {"$pull": {"outgoingRequests": body.toUser}},
+    )
+
+    if body.accept:
+        # add to friends
+        await db.users.update_one(
+            {"username": body.toUser},
+            {"$addToSet": {"friends": body.fromUser}},
+        )
+        await db.users.update_one(
+            {"username": body.fromUser},
+            {"$addToSet": {"friends": body.toUser}},
+        )
+        return {"msg": "friend accepted"}
+
+    return {"msg": "friend declined"}
+
+
+@app.delete("/users/{username}/friends/{friend_username}")
+async def remove_friend(username: str, friend_username: str):
+    if username == friend_username:
+        raise HTTPException(status_code=400, detail="Invalid friend")
+
+    me = await db.users.find_one({"username": username})
+    them = await db.users.find_one({"username": friend_username})
+
+    if not me or not them:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # remove from friends and any pending requests both ways
+    await db.users.update_one(
+        {"username": username},
+        {
+            "$pull": {
+                "friends": friend_username,
+                "incomingRequests": friend_username,
+                "outgoingRequests": friend_username,
+            }
+        },
+    )
+    await db.users.update_one(
+        {"username": friend_username},
+        {
+            "$pull": {
+                "friends": username,
+                "incomingRequests": username,
+                "outgoingRequests": username,
+            }
+        },
+    )
+
+    return {"msg": "friend removed"}
+
+
+
 
 @app.post("/dm/typing")
 async def set_typing(payload: TypingPayload):
@@ -391,3 +565,6 @@ async def get_typing_status(user1: str, user2: str):
         return {"typing": False, "fromUser": None}
 
     return {"typing": True, "fromUser": user2}
+
+
+#to launch the code the commands is uvicorn main:app --host 0.0.0.0 --port 8001 
