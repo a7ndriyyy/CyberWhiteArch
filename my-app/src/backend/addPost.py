@@ -179,6 +179,67 @@ def add_comment(post_id):
 
     return jsonify(serialize_comment(comment_doc)), 201
 
+@app.post("/posts/<post_id>/vote")
+def vote_post(post_id):
+    data = request.get_json() or {}
+    user_id = data.get("userId")
+    direction = data.get("direction")  # "up" or "down"
+
+    if not user_id:
+        return jsonify({"error": "userId required"}), 400
+
+    if direction not in ("up", "down"):
+        return jsonify({"error": "direction must be 'up' or 'down'"}), 400
+
+    if not ObjectId.is_valid(post_id):
+        return jsonify({"error": "invalid post id"}), 400
+
+    post = posts_col.find_one({"_id": ObjectId(post_id)})
+    if not post:
+        return jsonify({"error": "post not found"}), 404
+
+    # votes map: { userId: -1|0|1 }
+    votes = post.get("votes", {})
+    try:
+        old_vote = int(votes.get(user_id, 0))
+    except (TypeError, ValueError):
+        old_vote = 0
+
+    # ---------- decide new_vote based on direction + old_vote ----------
+    if direction == "up":
+        if old_vote == 1:
+            # was upvoted -> clear
+            new_vote = 0
+        elif old_vote == -1:
+            # was downvoted -> switch to upvote
+            new_vote = 1
+        else:
+            # no vote -> upvote
+            new_vote = 1
+    else:  # direction == "down"
+        if old_vote == -1:
+            # was downvoted -> clear
+            new_vote = 0
+        elif old_vote == 1:
+            # was upvoted -> switch to downvote
+            new_vote = -1
+        else:
+            # no vote -> downvote
+            new_vote = -1
+
+    diff = new_vote - old_vote  # how much this user changes score
+    current_score = post.get("score", 0) or 0
+    new_score = current_score + diff
+
+    votes[user_id] = new_vote
+
+    posts_col.update_one(
+        {"_id": post["_id"]},
+        {"$set": {"votes": votes, "score": new_score}}
+    )
+
+    return jsonify({"score": new_score, "myVote": new_vote}), 200
+
 
 if __name__ == "__main__":
     # important: run on the same port the React code uses
