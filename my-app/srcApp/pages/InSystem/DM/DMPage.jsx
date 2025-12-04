@@ -5,7 +5,7 @@ import DmHeader from "../../../componentsApp/DM/DmHeader.jsx";
 import DmList from "../../../componentsApp/DM/DmList.jsx";
 import DmComposer from "../../../componentsApp/DM/DmComposer.jsx";
 import DmChatPanel from "../../../componentsApp/DM/DmChatPanel.jsx";
-import FriendsFindTab from "../../../componentsApp/DM/FriendsFindTab.jsx";
+import {FriendsFindTab} from "../../../componentsApp/DM/FriendsFindTab.jsx"
 
 const DM_API = import.meta.env.VITE_DM_API || "http://100.107.245.15:8001";
 

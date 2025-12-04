@@ -100,12 +100,28 @@ export default function Center() {
   const openReactionPicker = (postId) => setOpenReactionFor(postId);
   const closeReactionPicker = () => setOpenReactionFor(null);
 
-  const setReaction = (postId, emoji) => {
-    setPosts((prev) =>
-      prev.map((p) => (p.id === postId ? { ...p, reaction: emoji } : p))
-    );
-    closeReactionPicker();
+  const setReaction = async (postId, emoji) => {
+    const userId = localStorage.getItem("userId");
+
+    try {
+      await axios.post(`${POSTS_API_BASE}/posts/${postId}/reaction`, {
+        userId,
+        emoji,
+      });
+
+      // update local state after backend succeeds
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId ? { ...p, reaction: emoji } : p
+        )
+      );
+    } catch (err) {
+      console.error("Failed to set reaction", err);
+    } finally {
+      closeReactionPicker();
+    }
   };
+
 
   const onMsgMouseDown = (postId) => {
     longPressTimer.current = setTimeout(
@@ -209,47 +225,32 @@ export default function Center() {
 
 
   // -------- Voting (Reddit-like) --------
-  const upvote = (postId) => {
-    setPosts((prev) =>
-      prev.map((p) => {
-        if (p.id !== postId || !p.allowVotes) return p;
-        let score = p.score || 0;
-        let my = p.myVote || 0;
-        if (my === 1) {
-          my = 0;
-          score -= 1;
-        } else if (my === -1) {
-          my = 1;
-          score += 2;
-        } else {
-          my = 1;
-          score += 1;
-        }
-        return { ...p, score, myVote: my };
-      })
-    );
-  };
+  const vote = async (postId, direction) => {
+  const userId = localStorage.getItem("userId");
+  if (!userId) return;
 
-  const downvote = (postId) => {
+  try {
+    const res = await axios.post(`${POSTS_API_BASE}/posts/${postId}/vote`, {
+      userId,
+      direction, // "up" or "down"
+    });
+
+    const { score, myVote } = res.data;
+
+    // update only that post with the server's truth
     setPosts((prev) =>
-      prev.map((p) => {
-        if (p.id !== postId || !p.allowVotes) return p;
-        let score = p.score || 0;
-        let my = p.myVote || 0;
-        if (my === -1) {
-          my = 0;
-          score += 1;
-        } else if (my === 1) {
-          my = -1;
-          score -= 2;
-        } else {
-          my = -1;
-          score -= 1;
-        }
-        return { ...p, score, myVote: my };
-      })
+      prev.map((p) =>
+        p.id === postId ? { ...p, score, myVote } : p
+      )
     );
-  };
+  } catch (err) {
+    console.error("Failed to vote", err);
+  }
+};
+
+const upvote = (postId) => vote(postId, "up");
+const downvote = (postId) => vote(postId, "down");
+
 
   return (
     <main className="cw-center">
