@@ -5,15 +5,38 @@ export default function DmHeader({
   initials, 
    guard,  setGuard,
   vanishOn, vanishText, onToggleVanish,
-  e2eKey,onTogglePanel,
+  e2eKey,  panelOpen,
+  railOpen,
+  onTogglePanel,
+  onToggleRail,
 }) {
   return (
     <header className="dm-top cw-card">
-      <div className="dm-top-left">
-        <button className="cw-chip" onClick={onTogglePanel}>☰ Chats</button>
-        <div className="pair">
-          <div className="badge">CW</div>
-          <div className="badge badge--mint">{initials}</div>
+   <div className="dm-top-left">
+        {/* TOGGLE A: profile / friends rail */}
+        <button
+          type="button"
+          className="dm-top-chip"
+          onClick={onToggleRail}
+        >
+          ☰ {railOpen ? "Hide menu" : "Menu"}
+        </button>
+
+        {/* TOGGLE B: chats list */}
+        <button
+          type="button"
+          className="dm-top-chip"
+          onClick={onTogglePanel}
+        >
+          💬 {panelOpen ? "Hide chats" : "Show chats"}
+        </button>
+
+        {/* existing avatar + chat name */}
+        <div className="dm-top-chat">
+          <div className="dm-avatar dm-me">{initials}</div>
+          <div>
+            <div>{name}</div>
+          </div>
         </div>
       </div>
 
