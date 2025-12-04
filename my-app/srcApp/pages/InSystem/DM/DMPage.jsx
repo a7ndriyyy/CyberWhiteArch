@@ -10,7 +10,7 @@ const DM_API = import.meta.env.VITE_DM_API || "http://100.107.245.15:8001";
 export default function DMPage() {
   // ----- theme -----
   const [theme, setTheme] = useState("dark");
-  const myUsername = localStorage.getItem("username"); // <-- username, not id
+  const myUsername = localStorage.getItem("username"); // username, not id
 
   useEffect(() => {
     const saved = localStorage.getItem("cwh-theme") || "dark";
@@ -41,14 +41,14 @@ export default function DMPage() {
   // ----- UI state -----
   const [panelOpen, setPanelOpen] = useState(true);
   const [panelQuery, setPanelQuery] = useState("");
-  const [activeChatId, setActiveChatId] = useState(null); // this will be friend's username
+  const [activeChatId, setActiveChatId] = useState(null); // friend's username
 
   const [verified, setVerified] = useState(true);
   const [guard, setGuard] = useState(true);
   const [vanish, setVanish] = useState({ on: false, endsAt: null });
   const [vanishText, setVanishText] = useState("Off");
 
-  // vanish countdown text
+  // ----- vanish countdown -----
   useEffect(() => {
     if (!vanish.on || !vanish.endsAt) {
       setVanishText("Off");
@@ -84,7 +84,7 @@ export default function DMPage() {
         const data = await res.json();
 
         const uiChats = (data.conversations || []).map(c => ({
-          id: c.otherUserId,               // <- this is other user's username
+          id: c.otherUserId, // username
           initials: c.initials,
           name: c.displayName,
           last: c.lastText,
@@ -129,7 +129,7 @@ export default function DMPage() {
           const ts = Date.parse(m.createdAt);
 
           return {
-            id: m._id || m.id, // depending on how Mongo doc comes back
+            id: m._id || m.id,
             ts,
             from: mine ? "ME" : other?.initials || "YOU",
             author: mine ? "You" : other?.name || m.fromUserId,
@@ -151,9 +151,9 @@ export default function DMPage() {
     };
 
     loadMessages();
-  }, [myUsername, activeChatId, chats]);
+  }, [myUsername, activeChatId]); // <- no "chats" here so it doesn't fight with send
 
-  // ----- send message -----
+  // ----- send message (optimistic) -----
   const sendMessage = async payload => {
     if (!myUsername || !activeChatId) return;
 
@@ -171,9 +171,28 @@ export default function DMPage() {
 
     if (!text.trim() && !code && attachments.length === 0) return;
 
+    // optimistic local msg
+    const ts = Date.now();
+    const optimistic = {
+      id: `local-${ts}`,
+      ts,
+      from: "ME",
+      author: "You",
+      time: new Date(ts).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      text: text.trim(),
+      attachments,
+      code,
+      mine: true,
+    };
+
+    setMessages(prev => [...prev, optimistic]);
+
     const body = {
-      fromUserId: myUsername,  // username!
-      toUserId: activeChatId,  // friend username
+      fromUserId: myUsername,
+      toUserId: activeChatId,
       text: text.trim(),
       code,
     };
@@ -192,14 +211,14 @@ export default function DMPage() {
       }
 
       const m = data.message;
-      const ts = Date.parse(m.createdAt) || Date.now();
+      const serverTs = Date.parse(m.createdAt) || Date.now();
 
-      const next = {
+      const serverMsg = {
         id: m._id || m.id,
-        ts,
+        ts: serverTs,
         from: "ME",
         author: "You",
-        time: new Date(ts).toLocaleTimeString([], {
+        time: new Date(serverTs).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         }),
@@ -209,25 +228,30 @@ export default function DMPage() {
         mine: true,
       };
 
-      setMessages(prev => [...prev, next]);
+      setMessages(prev => [
+        ...prev.filter(msg => !String(msg.id).startsWith("local-")),
+        serverMsg,
+      ]);
     } catch (err) {
       console.error("Send error", err);
     }
   };
 
-  // ----- add friend flow -----
+  // ----- add friend -----
   const onAddFriend = async () => {
     const username = friendUsername.trim();
     if (!username || !myUsername) return;
 
     setAddingFriend(true);
     try {
-      // 1) add friend on FastAPI backend
-      const res = await fetch(`${DM_API}/users/${encodeURIComponent(myUsername)}/friends`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ friendUsername: username }), // <-- must match FastAPI model
-      });
+      const res = await fetch(
+        `${DM_API}/users/${encodeURIComponent(myUsername)}/friends`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ friendUsername: username }),
+        }
+      );
       const data = await res.json();
       if (!res.ok) {
         console.error("Add friend failed:", data);
@@ -235,7 +259,6 @@ export default function DMPage() {
         return;
       }
 
-      // 2) search to get friend display data
       const searchRes = await fetch(
         `${DM_API}/users/search?q=${encodeURIComponent(username)}`
       );
@@ -248,9 +271,8 @@ export default function DMPage() {
         return;
       }
 
-      const friendId = match.username; // <-- username is our id
+      const friendId = match.username;
 
-      // 3) update chats list
       setChats(prev => {
         if (prev.some(c => c.id === friendId)) return prev;
         const now = new Date();
@@ -268,9 +290,7 @@ export default function DMPage() {
         return [newChat, ...prev];
       });
 
-      // 4) open DM with that friend
       setActiveChatId(friendId);
-
       setAddFriendOpen(false);
       setFriendUsername("");
     } catch (err) {
