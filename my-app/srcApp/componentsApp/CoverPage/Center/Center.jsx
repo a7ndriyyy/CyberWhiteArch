@@ -100,27 +100,31 @@ export default function Center() {
   const openReactionPicker = (postId) => setOpenReactionFor(postId);
   const closeReactionPicker = () => setOpenReactionFor(null);
 
-  const setReaction = async (postId, emoji) => {
-    const userId = localStorage.getItem("userId");
+const setReaction = async (postId, emoji) => {
+  const userId = localStorage.getItem("userId");
+  if (!userId) return;
 
-    try {
-      await axios.post(`${POSTS_API_BASE}/posts/${postId}/reaction`, {
-        userId,
-        emoji,
-      });
+  try {
+    const res = await axios.post(
+      `${POSTS_API_BASE}/posts/${postId}/reaction`,
+      { userId, emoji }
+    );
 
-      // update local state after backend succeeds
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId ? { ...p, reaction: emoji } : p
-        )
-      );
-    } catch (err) {
-      console.error("Failed to set reaction", err);
-    } finally {
-      closeReactionPicker();
-    }
-  };
+    const { reactions } = res.data || {};
+
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId ? { ...p, reactions: reactions || {} } : p
+      )
+    );
+  } catch (err) {
+    console.error("Failed to set reaction", err);
+  } finally {
+    closeReactionPicker();
+  }
+};
+
+
 
 
   const onMsgMouseDown = (postId) => {
@@ -237,7 +241,6 @@ export default function Center() {
 
     const { score, myVote } = res.data;
 
-    // update only that post with the server's truth
     setPosts((prev) =>
       prev.map((p) =>
         p.id === postId ? { ...p, score, myVote } : p
@@ -250,6 +253,7 @@ export default function Center() {
 
 const upvote = (postId) => vote(postId, "up");
 const downvote = (postId) => vote(postId, "down");
+
 
 
   return (
@@ -603,20 +607,41 @@ const downvote = (postId) => vote(postId, "down");
               </div>
 
               {/* Reaction badge */}
-              {p.reaction && (
-                <div style={{ marginTop: 6, fontSize: 14 }}>
-                  <span
-                    className="cw-react"
-                    style={{
-                      padding: "2px 6px",
-                      borderRadius: 12,
-                      background: "var(--cw-surface-2,#111)",
-                    }}
-                  >
-                    {p.reaction}
-                  </span>
-                </div>
-              )}
+          {/* Reactions badge list */}
+{(() => {
+  const reactions = p.reactions || {};               // <-- safe default
+  const reactionEntries = Object.entries(reactions); // [ [emoji, count], ... ]
+
+  if (reactionEntries.length === 0) return null;
+
+  return (
+    <div
+      className="cw-reactions"
+      style={{
+        marginTop: 6,
+        display: "flex",
+        gap: 6,
+        flexWrap: "wrap",
+      }}
+    >
+      {reactionEntries.map(([emoji, count]) => (
+        <span
+          key={emoji}
+          className="cw-react"
+          style={{
+            padding: "2px 8px",
+            borderRadius: 999,
+            background: "var(--elev-2, #121c22)",
+            border: "1px solid var(--stroke, #1e2a33)",
+            fontSize: 13,
+          }}
+        >
+          {emoji} {count > 1 ? count : ""}
+        </span>
+      ))}
+    </div>
+  );
+})()}
 
               {/* Reply composer (with image button + preview) */}
               {openCommentFor === p.id && (

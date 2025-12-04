@@ -227,7 +227,7 @@ def vote_post(post_id):
             # no vote -> downvote
             new_vote = -1
 
-    diff = new_vote - old_vote  # how much this user changes score
+    diff = new_vote - old_vote           # -1, 0, or +1
     current_score = post.get("score", 0) or 0
     new_score = current_score + diff
 
@@ -240,6 +240,61 @@ def vote_post(post_id):
 
     return jsonify({"score": new_score, "myVote": new_vote}), 200
 
+# Reaction
+@app.post("/posts/<post_id>/reaction")
+def set_reaction(post_id):
+    data = request.get_json() or {}
+    user_id = data.get("userId")
+    emoji = data.get("emoji")
+
+    if not user_id:
+        return jsonify({"error": "userId required"}), 400
+    if not emoji:
+        return jsonify({"error": "emoji required"}), 400
+    if not ObjectId.is_valid(post_id):
+        return jsonify({"error": "invalid post id"}), 400
+
+    post = posts_col.find_one({"_id": ObjectId(post_id)})
+    if not post:
+        return jsonify({"error": "post not found"}), 404
+
+    # aggregated counts: { "👍": 2, "😂": 1, ... }
+    reactions = post.get("reactions", {})
+    # per-user: { userId: "👍", ... }
+    reaction_by_user = post.get("reactionByUser", {})
+
+    old_emoji = reaction_by_user.get(user_id)
+
+    # --- remove old reaction from counts (if any) ---
+    if old_emoji:
+        old_count = int(reactions.get(old_emoji, 1))
+        new_count = max(0, old_count - 1)
+        if new_count == 0:
+            reactions.pop(old_emoji, None)
+        else:
+            reactions[old_emoji] = new_count
+
+    # --- toggle logic ---
+    if old_emoji == emoji:
+        # clicking same emoji again => remove your reaction
+        reaction_by_user.pop(user_id, None)
+    else:
+        # set / change reaction
+        reaction_by_user[user_id] = emoji
+        reactions[emoji] = int(reactions.get(emoji, 0)) + 1
+
+    posts_col.update_one(
+        {"_id": post["_id"]},
+        {
+            "$set": {
+                "reactions": reactions,
+                "reactionByUser": reaction_by_user,
+            }
+        }
+    )
+
+    # send back the updated reactions map
+    return jsonify({"reactions": reactions}), 200
 
 if __name__ == "__main__":
     # important: run on the same port the React code uses
