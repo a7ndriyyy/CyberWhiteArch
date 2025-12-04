@@ -2,9 +2,13 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime,timedelta
 import motor.motor_asyncio
 import re
+from bson import ObjectId 
+
+
+
 
 # --- MongoDB setup ---
 # IMPORTANT: same DB as Flask (Utilisateur)
@@ -14,6 +18,12 @@ DB_NAME = "Utilisateur"  # <-- match app.py
 client = motor.motor_asyncio.AsyncIOMotorClient(DATABASE_URI)
 db = client[DB_NAME]
 
+
+
+
+
+friend_requests = db["friendRequests"]
+typing_states   = db["typingStates"]
 # --- FastAPI setup ---
 app = FastAPI()
 
@@ -41,6 +51,17 @@ class Message(BaseModel):
 
 class FriendRequest(BaseModel):
     friendUsername: str
+
+class FriendRequestCreate(BaseModel):
+    toUsername: str
+
+class FriendRequestRespond(BaseModel):
+    accept: bool
+
+class TypingPayload(BaseModel):
+    fromUser: str
+    toUser: str
+    isTyping: bool    
 
 
 # --- Create default users on startup (optional) ---
@@ -258,3 +279,115 @@ async def add_friend(username: str, req: FriendRequest):
         "me": me_username,
         "friend": friend_username,
     }
+
+
+@app.post("/friends/request/{from_username}")
+async def create_friend_request(from_username: str, payload: FriendRequestCreate):
+    to_username = payload.toUsername.strip()
+
+    if not to_username:
+        raise HTTPException(status_code=400, detail="Missing toUsername")
+    if to_username == from_username:
+        raise HTTPException(status_code=400, detail="Cannot add yourself")
+
+    me = await db.users.find_one({"username": from_username})
+    friend = await db.users.find_one({"username": to_username})
+    if not me or not friend:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # already friends?
+    if to_username in me.get("friends", []):
+        return {"msg": "already_friends"}
+
+    # already pending?
+    existing = await friend_requests.find_one({
+        "from": from_username,
+        "to": to_username,
+        "status": "pending",
+    })
+    if existing:
+        return {"msg": "already_pending"}
+
+    doc = {
+        "from": from_username,
+        "to": to_username,
+        "status": "pending",
+        "createdAt": datetime.utcnow(),
+        "decidedAt": None,
+    }
+    res = await friend_requests.insert_one(doc)
+
+    return {
+        "requestId": str(res.inserted_id),
+        "status": "pending",
+        "msg": "request_sent",
+    }
+
+
+
+@app.get("/friends/requests/{username}")
+async def list_friend_requests(username: str):
+    incoming = []
+    outgoing = []
+
+    async for fr in friend_requests.find({"to": username}).sort("createdAt", -1):
+        incoming.append({
+            "id": str(fr["_id"]),
+            "from": fr["from"],
+            "to": fr["to"],
+            "status": fr.get("status", "pending"),
+            "createdAt": fr["createdAt"].isoformat() + "Z",
+        })
+
+    async for fr in friend_requests.find({"from": username}).sort("createdAt", -1):
+        outgoing.append({
+            "id": str(fr["_id"]),
+            "from": fr["from"],
+            "to": fr["to"],
+            "status": fr.get("status", "pending"),
+            "createdAt": fr["createdAt"].isoformat() + "Z",
+        })
+
+    return {"incoming": incoming, "outgoing": outgoing}
+
+@app.post("/dm/typing")
+async def set_typing(payload: TypingPayload):
+    now = datetime.utcnow()
+
+    if payload.isTyping:
+        # upsert record valid for a few seconds
+        await typing_states.update_one(
+            {"fromUser": payload.fromUser, "toUser": payload.toUser},
+            {
+                "$set": {
+                    "fromUser": payload.fromUser,
+                    "toUser": payload.toUser,
+                    "expiresAt": now + timedelta(seconds=5),
+                }
+            },
+            upsert=True,
+        )
+    else:
+        await typing_states.delete_one(
+            {"fromUser": payload.fromUser, "toUser": payload.toUser}
+        )
+
+    return {"ok": True}
+
+@app.get("/dm/typing-status")
+async def get_typing_status(user1: str, user2: str):
+    """
+    user1 = "me", user2 = "other".
+    We check if user2 is currently typing to user1.
+    """
+    now = datetime.utcnow()
+    doc = await typing_states.find_one({
+        "fromUser": user2,
+        "toUser": user1,
+        "expiresAt": {"$gt": now},
+    })
+
+    if not doc:
+        return {"typing": False, "fromUser": None}
+
+    return {"typing": True, "fromUser": user2}

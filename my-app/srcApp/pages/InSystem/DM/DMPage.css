@@ -486,4 +486,28 @@
   font-size: 13px;
 }
 
+.dm-typing-indicator {
+  margin: 4px 0 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+  opacity: 0.9;
+}
 
+.dm-requests-bar {
+  display: flex;
+  gap: 8px;
+  padding: 4px 12px 0;
+  font-size: 12px;
+}
+
+.dm-requests-pill {
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: var(--elev-2);
+  color: var(--muted);
+}
+
+.dm-requests-pill--out {
+  border-style: dashed;
+}

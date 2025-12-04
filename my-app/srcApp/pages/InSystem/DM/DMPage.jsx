@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";  
+
 import "./DMPage.css";
 import DmHeader from "../../../componentsApp/DM/DmHeader.jsx";
 import DmList from "../../../componentsApp/DM/DmList.jsx";
@@ -38,6 +39,12 @@ export default function DMPage() {
   const [friendUsername, setFriendUsername] = useState("");
   const [addingFriend, setAddingFriend] = useState(false);
 
+
+  const [typingFrom, setTypingFrom] = useState(null);
+
+  const [incomingRequests, setIncomingRequests] = useState([]);
+  const [outgoingRequests, setOutgoingRequests] = useState([]);
+
   // ----- UI state -----
   const [panelOpen, setPanelOpen] = useState(true);
   const [panelQuery, setPanelQuery] = useState("");
@@ -47,6 +54,34 @@ export default function DMPage() {
   const [guard, setGuard] = useState(true);
   const [vanish, setVanish] = useState({ on: false, endsAt: null });
   const [vanishText, setVanishText] = useState("Off");
+
+
+
+
+
+useEffect(() => {
+  if (!myUsername) return;
+
+  const fetchRequests = async () => {
+    try {
+      const res = await fetch(
+        `${DM_API}/friends/requests/${encodeURIComponent(myUsername)}`
+      );
+      const data = await res.json();
+      setIncomingRequests(data.incoming || []);
+      setOutgoingRequests(data.outgoing || []);
+    } catch (err) {
+      console.error("friend requests error", err);
+    }
+  };
+
+  fetchRequests();
+  const id = setInterval(fetchRequests, 3000); // every 3s
+  return () => clearInterval(id);
+}, [myUsername]);
+
+
+
 
   // ----- vanish countdown -----
   useEffect(() => {
@@ -115,64 +150,67 @@ export default function DMPage() {
   }, [myUsername, activeChatId]);
 
   // ----- poll messages for active chat every 2s -----
-  useEffect(() => {
-    if (!myUsername || !activeChatId) return;
+useEffect(() => {
+  if (!myUsername || !activeChatId) return;
 
-    let cancelled = false;
+  let stopped = false;
 
-    const fetchMessages = async () => {
-      try {
-        const res = await fetch(
+  const fetchAll = async () => {
+    try {
+      const [msgRes, typingRes] = await Promise.all([
+        fetch(
           `${DM_API}/dm/messages?user1=${encodeURIComponent(
             myUsername
           )}&user2=${encodeURIComponent(activeChatId)}`
-        );
-        const data = await res.json();
-        if (!res.ok) {
-          console.error("Failed to load messages", data);
-          return;
-        }
+        ),
+        fetch(
+          `${DM_API}/dm/typing-status?user1=${encodeURIComponent(
+            myUsername
+          )}&user2=${encodeURIComponent(activeChatId)}`
+        ),
+      ]);
 
-        const other = chats.find(c => c.id === activeChatId);
+      const msgData = await msgRes.json();
+      const typingData = await typingRes.json();
+      const other = chats.find(c => c.id === activeChatId);
 
-        const uiMessages = (data.messages || []).map(m => {
-          const mine = m.fromUserId === myUsername;
-          const ts = Date.parse(m.createdAt);
+      const uiMessages = (msgData.messages || []).map(m => {
+        const mine = m.fromUserId === myUsername;
+        const ts = Date.parse(m.createdAt);
 
-          return {
-            id: m._id || m.id,
-            ts,
-            from: mine ? "ME" : other?.initials || "YOU",
-            author: mine ? "You" : other?.name || m.fromUserId,
-            time: new Date(m.createdAt).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-            text: m.text,
-            mine,
-            attachments: m.attachments || [],
-            code: m.code || null,
-          };
-        });
+        return {
+          id: m._id || m.id,
+          ts,
+          from: mine ? "ME" : other?.initials || "YOU",
+          author: mine ? "You" : other?.name || m.fromUserId,
+          time: new Date(m.createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          text: m.text,
+          mine,
+          attachments: m.attachments || [],
+          code: m.code || null,
+        };
+      });
 
-        if (!cancelled) {
-          setMessages(uiMessages);
-        }
-      } catch (err) {
-        console.error("Failed to load messages", err);
+      if (!stopped) {
+        setMessages(uiMessages);
+        setTypingFrom(typingData.typing ? typingData.fromUser : null);
       }
-    };
+    } catch (err) {
+      console.error("Failed to load messages / typing", err);
+    }
+  };
 
-    // initial fetch
-    fetchMessages();
-    // poll every 2 seconds
-    const interval = setInterval(fetchMessages, 100);
+  fetchAll();
+  const interval = setInterval(fetchAll, 100); // 1s polling
+  return () => {
+    stopped = true;
+    clearInterval(interval);
+  };
+}, [myUsername, activeChatId, chats]);
 
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [myUsername, activeChatId, chats]);
 
   // ----- send message -----
   const sendMessage = async payload => {
@@ -283,6 +321,25 @@ export default function DMPage() {
     }
   };
 
+const handleTypingChange = async (isTyping) => {
+  if (!myUsername || !activeChatId) return;
+  try {
+    await fetch(`${DM_API}/dm/typing`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fromUser: myUsername,
+        toUser: activeChatId,
+        isTyping,
+      }),
+    });
+  } catch (err) {
+    console.error("typing error", err);
+  }
+};
+
+
+
   const activeChat =
     chats.find(c => c.id === activeChatId) || { name: "Chat", initials: "U" };
 
@@ -316,6 +373,28 @@ export default function DMPage() {
           onTogglePanel={() => setPanelOpen(v => !v)}
         />
 
+{(incomingRequests.length > 0 || outgoingRequests.length > 0) && (
+    <div className="dm-requests-bar">
+      {incomingRequests.length > 0 && (
+        <span className="dm-requests-pill">
+          {incomingRequests.length} incoming request
+          {incomingRequests.length > 1 ? "s" : ""}
+        </span>
+      )}
+      {outgoingRequests.length > 0 && (
+        <span className="dm-requests-pill dm-requests-pill--out">
+          {outgoingRequests.length} pending invite
+          {outgoingRequests.length > 1 ? "s" : ""}
+        </span>
+      )}
+    </div>
+  )}
+
+  {typingFrom && (
+    <div className="dm-typing-indicator">
+      {typingFrom} is typing…
+    </div>
+  )}
         <div className="dm-body cw-card">
           <DmList messages={messages} />
 
@@ -332,6 +411,7 @@ export default function DMPage() {
             vanishOn={vanish.on}
             vanishText={vanishText}
             onSend={sendMessage}
+            onTypingChange={handleTypingChange}
           />
         </div>
       </div>
