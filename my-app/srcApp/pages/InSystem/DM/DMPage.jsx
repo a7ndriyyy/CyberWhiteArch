@@ -88,10 +88,12 @@ export default function DMPage() {
           initials: c.initials,
           name: c.displayName,
           last: c.lastText,
-          time: new Date(c.lastAt).toLocaleTimeString([], {
+          time: c.lastAt
+          ? new Date(c.lastAt).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
-          }),
+          })
+          : "",
           unread: 0,
         }));
 

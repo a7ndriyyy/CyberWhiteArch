@@ -1,5 +1,6 @@
 // ToolsPage.jsx
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ToolCard from './ToolsCard';
 import './Tools.css'; // Import the CSS file for styling
 import ScrollToTop from '../Scroll/ScrollTop'; // Import the ScrollToTop component
@@ -16,481 +17,577 @@ const ToolsPage = () => {
     title: 'Nmap',
     description: 'Scans networks to discover hosts, services, and open ports.',
     icon: '/icons/nmap.svg',
+    slug: 'nmap',
   },
   {
     title: 'OSINT',
     description: 'Collects data from public platforms to build target profiles.',
     icon: '/icons/osint.svg',
+    slug: 'osint',
   },
   {
     title: 'bcrypt',
     description: 'Encrypts passwords using a strong hashing algorithm.',
     icon: '/icons/bcrypt.svg',
+    slug: 'bcrypt',
   },
   {
     title: 'SQL Injection Tester',
     description: 'Test for SQL injection vulnerabilities.',
     icon: '/icons/sql.svg',
+    slug: 'sql-injection-tester',
   },
   {
     title: 'Hydra',
     description: 'Tries multiple passwords quickly to crack accounts.',
     icon: '/icons/hydra.svg',
+    slug: 'hydra',
   },
   {
     title: 'DNS Lookup',
     description: 'Gets domain-related data.',
     icon: '/icons/dns.svg',
+    slug: 'dns-lookup',
   },
   {
   title: 'Nikto',
   description: 'Scans web servers for known vulnerabilities and configuration issues.',
   icon: '/icons/nikto.svg',
+  slug: 'nikto',
 },
 {
   title: 'Metasploit',
   description: 'Framework for developing and executing exploit code against a remote target machine.',
   icon: '/icons/metasploit.svg',
+  slug: 'metasploit',
 },
 {
   title: 'Burp Suite',
   description: 'Web vulnerability scanner and proxy tool for testing web application security.',
   icon: '/icons/burp.svg',
+  slug: 'burp-suite',
 },
 {
   title: 'John the Ripper',
   description: 'Password cracker tool that supports many hash types.',
   icon: '/icons/john.svg',
+  slug: 'john-the-ripper',
 },
 {
   title: 'Wireshark',
   description: 'Captures and analyzes network traffic in real time.',
   icon: '/icons/wireshark.svg',
+  slug: 'wireshark',
 },
 {
   title: 'Aircrack-ng',
   description: 'Cracks WEP/WPA WiFi passwords using packet sniffing.',
   icon: '/icons/aircrack.svg',
+  slug: 'aircrack-ng',
 },
 {
   title: 'Maltego',
   description: 'Performs link analysis and data mining for OSINT investigations.',
   icon: '/icons/maltego.svg',
+  slug: 'maltego',
 },
 {
   title: 'Shodan',
   description: 'Search engine for Internet-connected devices and services.',
   icon: '/icons/shodan.svg',
+  slug: 'shodan',
 },
 {
   title: 'Hashcat',
   description: 'High-performance password recovery tool supporting GPU acceleration.',
   icon: '/icons/hashcat.svg',
+  slug: 'hashcat',
 },
 {
   title: 'ZAP',
   description: 'OWASP’s web app scanner for finding vulnerabilities in apps and APIs.',
   icon: '/icons/zap.svg',
+  slug: 'owasp-zap',
 },
 {
   title: 'OpenVAS',
   description: 'Performs comprehensive vulnerability scanning and management.',
   icon: '/icons/openvas.svg',
+  slug: 'openvas',
 },
 {
   title: 'SQLMap',
   description: 'Automates the process of detecting and exploiting SQL injection flaws.',
   icon: '/icons/sqlmap.svg',
+  slug: 'sqlmap',
 },
 {
   title: 'Ettercap',
   description: 'Performs man-in-the-middle attacks on LAN for sniffing and injection.',
   icon: '/icons/ettercap.svg',
+  slug: 'ettercap',
 },
 {
   title: 'Netcat',
   description: 'Swiss-army knife for network diagnostics, port scanning, and backdoors.',
   icon: '/icons/netcat.svg',
+  slug: 'netcat',
 },
 {
   title: 'Recon-ng',
   description: 'Powerful web reconnaissance framework with a modular interface.',
   icon: '/icons/reconng.svg',
+  slug: 'recon-ng',
 },
 {
   title: 'Angry IP Scanner',
   description: 'Fast and lightweight IP address and port scanner.',
   icon: '/icons/angryip.svg',
+  slug: 'angry-ip-scanner',
 },
 {
   title: 'Acunetix',
   description: 'Automated web vulnerability scanner for detecting over 7,000 issues.',
   icon: '/icons/acunetix.svg',
+  slug: 'acunetix',
 },
 {
   title: 'Invicti',
   description: 'Enterprise-grade web app security scanner (formerly Netsparker).',
   icon: '/icons/invicti.svg',
+  slug: 'invicti',
 },
 {
   title: 'SpiderFoot',
   description: 'Automated OSINT tool for threat intelligence and attack surface mapping.',
   icon: '/icons/spiderfoot.svg',
+  slug: 'spiderfoot',
 },
 {
   title: 'XploitGPT',
   description: 'AI-assisted tool for generating and analyzing exploit payloads.',
   icon: '/icons/xploitgpt.svg',
+  slug: 'xploitgpt',
 },
 {
   title: 'NetHunter',
   description: 'Kali Linux’s mobile penetration testing platform for Android devices.',
   icon: '/icons/nethunter.svg',
+  slug: 'nethunter',
 },
 {
   title: 'Cuckoo Sandbox',
   description: 'Automated malware analysis system for dynamic behavior inspection.',
   icon: '/icons/cuckoo.svg',
+  slug: 'cuckoo-sandbox',
 },
 {
   title: 'Snort',
   description: 'Real-time traffic analyzer and intrusion detection system.',
   icon: '/icons/snort.svg',
+  slug: 'snort',
 },
 {
   title: 'Yersinia',
   description: 'Network protocol testing tool for Layer 2 attacks.',
   icon: '/icons/yersinia.svg',
+  slug: 'yersinia',
 },
 {
   title: 'THC-Hydra',
   description: 'Fast and flexible login cracker supporting many protocols.',
   icon: '/icons/thc.svg',
+  slug: 'thc-hydra',
 },
 {
   title: 'Responder',
   description: 'Captures and relays credentials on internal networks.',
   icon: '/icons/responder.svg',
+  slug: 'responder',
 },
 {
   title: 'Social-Engineer Toolkit',
   description: 'Framework for simulating social engineering attacks.',
   icon: '/icons/setoolkit.svg',
+  slug: 'social-engineer-toolkit',
 },
 {
   title: 'Binwalk',
   description: 'Firmware analysis tool for reverse engineering embedded devices.',
   icon: '/icons/binwalk.svg',
+  slug: 'binwalk',
 },
 {
   title: 'Radare2',
   description: 'Advanced open-source reverse engineering framework.',
   icon: '/icons/radare2.svg',
+  slug: 'radare2',
 },
 {
   title: 'Faraday',
   description: 'Collaborative pentesting and vulnerability management platform.',
   icon: '/icons/faraday.svg',
+  slug: 'faraday',
 },
 {
   title: 'NetStumbler',
   description: 'Detects wireless networks and helps identify weak Wi-Fi configurations.',
   icon: '/icons/netstumbler.svg',
+  slug: 'netstumbler',
 },
 {
   title: 'Fierce',
   description: 'DNS reconnaissance tool for locating non-contiguous IP space and hostnames.',
   icon: '/icons/fierce.svg',
+  slug: 'fierce',
 },
 {
   title: 'Wapiti',
   description: 'Performs black-box web application vulnerability scans.',
   icon: '/icons/wapiti.svg',
+  slug: 'wapiti',
 },
 {
   title: 'Nikto2',
   description: 'Updated version of Nikto with improved web server scanning capabilities.',
   icon: '/icons/nikto2.svg',
+  slug: 'nikto2',
 },
 {
   title: 'HTTrack',
   description: 'Website copier useful for offline analysis and reconnaissance.',
   icon: '/icons/httrack.svg',
+  slug: 'httrack',
 },
 {
   title: 'BeEF',
   description: 'Browser Exploitation Framework for client-side attack vectors.',
   icon: '/icons/beef.svg',
+  slug: 'beef',
 },
 {
   title: 'OWASP Amass',
   description: 'Performs DNS enumeration, scraping, and mapping attack surfaces.',
   icon: '/icons/amass.svg',
+  slug: 'owasp-amass',
 },
 {
   title: 'DirBuster',
   description: 'Brute-forces directories and file names on web servers.',
   icon: '/icons/dirbuster.svg',
+  slug: 'dirbuster',
 },
 {
   title: 'Fuff',
   description: 'Fast web fuzzer for discovering hidden files, directories, and parameters.',
   icon: '/icons/ffuf.svg',
+  slug: 'fuff',
 },
 {
   title: 'Ghidra',
   description: 'NSA’s reverse engineering suite for analyzing binaries.',
   icon: '/icons/ghidra.svg',
+  slug: 'ghidra',
 },
 {
   title: 'Volatility',
   description: 'Memory forensics framework for analyzing RAM dumps.',
   icon: '/icons/volatility.svg',
+  slug: 'volatility',
 },
 {
   title: 'Censys',
   description: 'Search engine for discovering internet-connected assets and vulnerabilities.',
   icon: '/icons/censys.svg',
+  slug: 'censys',
 },
 {
   title: 'Sherlock',
   description: 'Finds usernames across many social networks for OSINT investigations.',
   icon: '/icons/sherlock.svg',
+  slug: 'sherlock',
 },
 {
   title: 'ExifTool',
   description: 'Extracts metadata from files, useful for digital forensics.',
   icon: '/icons/exiftool.svg',
+  slug: 'exiftool',
 },
 {
   title: 'CrackMapExec',
   description: 'Swiss-army knife for pentesting Active Directory environments.',
   icon: '/icons/cme.svg',
+  slug: 'crackmapexec',
 },
 {
   title: 'Empire',
   description: 'Post-exploitation framework with PowerShell and Python agents.',
   icon: '/icons/empire.svg',
+  slug: 'empire',
 },
 {
   title: 'BloodHound',
   description: 'Analyzes Active Directory trust relationships for privilege escalation paths.',
   icon: '/icons/bloodhound.svg',
+  slug: 'bloodhound',
 },
 {
   title: 'Pupy',
   description: 'Cross-platform remote administration and post-exploitation tool.',
   icon: '/icons/pupy.svg',
+  slug: 'pupy',
 },
 {
   title: 'Scapy',
   description: 'Powerful packet manipulation tool for network discovery and attacks.',
   icon: '/icons/scapy.svg',
+  slug: 'scapy',
 },
 {
   title: 'Dnsenum',
   description: 'Performs DNS enumeration and zone transfers.',
   icon: '/icons/dnsenum.svg',
+  slug: 'dnsenum',
 },
 {
   title: 'ReconDog',
   description: 'All-in-one reconnaissance tool for gathering domain and IP information.',
   icon: '/icons/recondog.svg',
+  slug: 'recondog',
 },
 {
   title: 'Nessus',
   description: 'Industry-standard vulnerability scanner for identifying security issues.',
   icon: '/icons/nessus.svg',
+  slug: 'nessus',
 },
 {
   title: 'Paros Proxy',
   description: 'Intercepting proxy for analyzing and modifying HTTP/HTTPS traffic.',
   icon: '/icons/paros.svg',
+  slug: 'paros-proxy',
 },
 {
   title: 'Nikto Plus',
   description: 'Enhanced version of Nikto with extended vulnerability checks.',
   icon: '/icons/niktoplus.svg',
+  slug: 'nikto-plus',
 },
 {
   title: 'Dnsrecon',
   description: 'Performs DNS enumeration and zone transfers with brute-force support.',
   icon: '/icons/dnsrecon.svg',
+  slug: 'dnsrecon',
 },
 {
   title: 'Sublist3r',
   description: 'Fast subdomain enumeration tool using OSINT techniques.',
   icon: '/icons/sublist3r.svg',
+  slug: 'sublist3r',
 },
 {
   title: 'Wifite',
   description: 'Automated wireless attack tool for cracking WPA/WPA2 passwords.',
   icon: '/icons/wifite.svg',
+  slug: 'wifite',
 },
 {
   title: 'XSStrike',
   description: 'Advanced XSS detection and exploitation suite.',
   icon: '/icons/xsstrike.svg',
+  slug: 'xsstrike',
 },
 {
   title: 'PayloadsAllTheThings',
   description: 'Massive collection of payloads for pentesting and bug bounty hunting.',
   icon: '/icons/payloads.svg',
+  slug: 'payloads-all-the-things',
 },
 {
   title: 'SecLists',
   description: 'Comprehensive collection of wordlists for fuzzing and brute-force attacks.',
   icon: '/icons/seclists.svg',
+  slug: 'seclists',
 },
 {
   title: 'Rubeus',
   description: 'Kerberos abuse toolkit for red teamers and post-exploitation.',
   icon: '/icons/rubeus.svg',
+  slug: 'rubeus', 
 },
 {
   title: 'Kerbrute',
   description: 'Brute-forces and enumerates Active Directory user accounts via Kerberos.',
   icon: '/icons/kerbrute.svg',
+  slug: 'kerbrute',
 },
 {
   title: 'Impacket',
   description: 'Collection of Python classes for working with network protocols.',
   icon: '/icons/impacket.svg',
+  slug: 'impacket',
 },
 {
   title: 'CrackStation',
   description: 'Online password hash cracker using a massive precomputed dictionary.',
   icon: '/icons/crackstation.svg',
+  slug: 'crackstation',
 },
 {
   title: 'NoSQLMap',
   description: 'Automated NoSQL injection and exploitation tool.',
   icon: '/icons/nosqlmap.svg',
+  slug: 'nosqlmap',
 },
 {
   title: 'JWT Tool',
   description: 'Toolkit for testing and exploiting JSON Web Tokens.',
   icon: '/icons/jwt.svg',
+  slug: 'jwt-tool',
 },
 {
   title: 'Burp Collaborator',
   description: 'External service for detecting out-of-band vulnerabilities.',
   icon: '/icons/collaborator.svg',
+  slug: 'burp-collaborator',
 },
 {
   title: 'Pwncat',
   description: 'Post-exploitation platform for maintaining access and automating tasks.',
   icon: '/icons/pwncat.svg',
+  slug: 'pwncat',
 },
 {
   title: 'Ghost Framework',
   description: 'Remote administration tool for Android devices.',
   icon: '/icons/ghost.svg',
+  slug: 'ghost-framework',
 },
 {
   title: 'APKTool',
   description: 'Reverse engineers Android apps for analysis and modification.',
   icon: '/icons/apktool.svg',
+  slug: 'apktool',
 },
 {
   title: 'ReconSpider',
   description: 'Automated reconnaissance tool for gathering OSINT and network intel.',
   icon: '/icons/reconspider.svg',
+  slug: 'reconspider',
 },
 {
   title: 'Hping3',
   description: 'Packet crafting tool for firewall testing and network diagnostics.',
   icon: '/icons/hping3.svg',
+  slug: 'hping3',
 },
 {
   title: 'ZMap',
   description: 'Fast single-packet network scanner for Internet-wide surveys.',
   icon: '/icons/zmap.svg',
+  slug: 'zmap',
 },
 {
   title: 'Dnsx',
   description: 'Fast and flexible DNS toolkit for subdomain enumeration and resolution.',
   icon: '/icons/dnsx.svg',
+  slug: 'dnsx',
 },
 {
   title: 'Amass',
   description: 'Advanced tool for DNS enumeration and attack surface mapping.',
   icon: '/icons/amass.svg',
+  slug: 'amass',
 },
 {
   title: 'RustScan',
   description: 'Blazing fast port scanner built in Rust.',
   icon: '/icons/rustscan.svg',
+  slug: 'rustscan',
 },
 {
   title: 'Gospider',
   description: 'Fast web spider for discovering endpoints and URLs.',
   icon: '/icons/gospider.svg',
+  slug: 'gospider',
 },
 {
   title: 'Nuclei',
   description: 'Fast vulnerability scanner using customizable templates.',
   icon: '/icons/nuclei.svg',
+  slug: 'nuclei',
 },
 {
   title: 'Dirsearch',
   description: 'Command-line tool for brute-forcing directories and files on web servers.',
   icon: '/icons/dirsearch.svg',
+  slug: 'dirsearch',
 },
 {
   title: 'Masscan',
   description: 'Internet-scale port scanner with lightning speed.',
   icon: '/icons/masscan.svg',
+  slug: 'masscan',
 },
 {
   title: 'Wfuzz',
   description: 'Flexible web application fuzzer for discovering hidden parameters.',
   icon: '/icons/wfuzz.svg',
+  slug: 'wfuzz',
 },
 {
   title: 'HydraX',
   description: 'Enhanced version of Hydra with GUI and extended protocol support.',
   icon: '/icons/hydrax.svg',
+  slug: 'hydrax',
 },
 {
   title: 'Cobalt Strike',
   description: 'Commercial red teaming tool for post-exploitation and C2.',
   icon: '/icons/cobaltstrike.svg',
+  slug: 'cobalt-strike',
 },
 {
   title: 'Sliver',
   description: 'Open-source adversary emulation framework for red teams.',
   icon: '/icons/sliver.svg',
+  slug: 'sliver',
 },
 {
   title: 'Brute Ratel',
   description: 'Advanced red team operations platform with EDR evasion.',
   icon: '/icons/bruteratel.svg',
+  slug: 'brute-ratel',
 },
 {
   title: 'Fierce2',
   description: 'Updated DNS recon tool for discovering hidden infrastructure.',
   icon: '/icons/fierce2.svg',
+  slug: 'fierce2',
 },
 {
   title: 'CVE Search',
   description: 'Search engine for known vulnerabilities and exploits.',
   icon: '/icons/cvesearch.svg',
+  slug: 'cve-search',
 },
 {
   title: 'ExploitDB CLI',
   description: 'Command-line interface for searching Exploit Database.',
   icon: '/icons/exploitdb.svg',
+  slug: 'exploitdb-cli',
 },
 {
   title: 'PacketTotal',
   description: 'Online tool for analyzing PCAP files and detecting threats.',
   icon: '/icons/packettotal.svg',
+  slug: 'packettotal',
 },
 {
   title: 'CyberChef',
   description: 'Swiss-army knife for encoding, decoding, and data transformation.',
   icon: '/icons/cyberchef.svg',
+  slug: 'cyberchef',
 }
 
   ];
@@ -511,12 +608,14 @@ const ToolsPage = () => {
       />
       <div className="tools-container">
         {filteredTools.map((tool, index) => (
+          <Link to={`/documetation/${tool.slug}}`} key={index} style={{ textDecoration: 'none' }}>
           <ToolCard
             key={index}
             title={tool.title}
             description={tool.description}
             icon={tool.icon}
           />
+          </Link>
         ))}
       </div>
       <ScrollToTop />

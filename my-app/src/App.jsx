@@ -14,7 +14,6 @@ import Login from './components/Login/Login';
 import Register from './components/Register/Register';
 import Tools from './pages/Tools/Tools';
 import Community from './pages/Community/Community';
-import SourceFiles from './pages/SourceFiles/SourceFiles';
 
 // Social network pages
 import RegistrationSuccess from '../srcApp/pages/RegistrationSuccess';
@@ -59,9 +58,8 @@ function App() {
           <Route index element={<Home />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-        <Route path="documetation" element={<Tools />} />
+        <Route path="documentation" element={<Tools />} />
         <Route path="community" element={<Community />} />
-        <Route path="source-files" element={<SourceFiles />} />
         </Route>
 
         {/* Social network routes (protected) */}
