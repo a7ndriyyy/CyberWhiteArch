@@ -5,11 +5,12 @@ import DmList from "../../../componentsApp/DM/DmList.jsx";
 import DmComposer from "../../../componentsApp/DM/DmComposer.jsx";
 import DmChatPanel from "../../../componentsApp/DM/DmChatPanel.jsx";
 
+const DM_API = import.meta.env.VITE_DM_API || "http://100.107.245.15:8001";
+
 export default function DMPage() {
   // ----- theme -----
   const [theme, setTheme] = useState("dark");
-  const myUserId = localStorage.getItem("cwh-userId");     // adjust key if different
-  // const myUsername = localStorage.getItem("cwh-username"); // optional, not required
+  const myUsername = localStorage.getItem("username"); // <-- username, not id
 
   useEffect(() => {
     const saved = localStorage.getItem("cwh-theme") || "dark";
@@ -30,8 +31,8 @@ export default function DMPage() {
   }, [theme]);
 
   // ----- DM data -----
-  const [chats, setChats] = useState([]);      // sidebar chats from backend
-  const [messages, setMessages] = useState([]); // messages for active chat
+  const [chats, setChats] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   const [addFriendOpen, setAddFriendOpen] = useState(false);
   const [friendUsername, setFriendUsername] = useState("");
@@ -40,7 +41,7 @@ export default function DMPage() {
   // ----- UI state -----
   const [panelOpen, setPanelOpen] = useState(true);
   const [panelQuery, setPanelQuery] = useState("");
-  const [activeChatId, setActiveChatId] = useState(null);
+  const [activeChatId, setActiveChatId] = useState(null); // this will be friend's username
 
   const [verified, setVerified] = useState(true);
   const [guard, setGuard] = useState(true);
@@ -65,9 +66,8 @@ export default function DMPage() {
     return () => clearInterval(id);
   }, [vanish]);
 
-  // toggle vanish mode (1 hour)
   const onToggleVanish = () => {
-    setVanish((prev) =>
+    setVanish(prev =>
       prev.on
         ? { on: false, endsAt: null }
         : { on: true, endsAt: Date.now() + 60 * 60 * 1000 }
@@ -76,15 +76,15 @@ export default function DMPage() {
 
   // ----- load conversations -----
   useEffect(() => {
-    if (!myUserId) return;
+    if (!myUsername) return;
 
     const loadConversations = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/dm/conversations/${myUserId}`);
+        const res = await fetch(`${DM_API}/dm/conversations/${myUsername}`);
         const data = await res.json();
 
-        const uiChats = (data.conversations || []).map((c) => ({
-          id: c.otherUserId,
+        const uiChats = (data.conversations || []).map(c => ({
+          id: c.otherUserId,               // <- this is other user's username
           initials: c.initials,
           name: c.displayName,
           last: c.lastText,
@@ -106,29 +106,31 @@ export default function DMPage() {
     };
 
     loadConversations();
-  }, [myUserId, activeChatId]);
+  }, [myUsername, activeChatId]);
 
   // ----- load messages for active chat -----
   useEffect(() => {
-    if (!myUserId || !activeChatId) return;
+    if (!myUsername || !activeChatId) return;
 
     const loadMessages = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/dm/messages?user1=${myUserId}&user2=${activeChatId}`
+          `${DM_API}/dm/messages?user1=${encodeURIComponent(
+            myUsername
+          )}&user2=${encodeURIComponent(activeChatId)}`
         );
         const data = await res.json();
-        const other = chats.find((c) => c.id === activeChatId);
+        const other = chats.find(c => c.id === activeChatId);
 
-        const uiMessages = (data.messages || []).map((m) => {
-          const mine = m.fromUserId === myUserId;
+        const uiMessages = (data.messages || []).map(m => {
+          const mine = m.fromUserId === myUsername;
           const ts = Date.parse(m.createdAt);
 
           return {
-            id: m.id,
+            id: m._id || m.id, // depending on how Mongo doc comes back
             ts,
-            from: mine ? "ME" : (other?.initials || "YOU"),
-            author: mine ? "You" : (other?.name || m.fromUserId),
+            from: mine ? "ME" : other?.initials || "YOU",
+            author: mine ? "You" : other?.name || m.fromUserId,
             time: new Date(m.createdAt).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -147,11 +149,11 @@ export default function DMPage() {
     };
 
     loadMessages();
-  }, [myUserId, activeChatId, chats]);
+  }, [myUsername, activeChatId, chats]);
 
   // ----- send message -----
-  const sendMessage = async (payload) => {
-    if (!myUserId || !activeChatId) return;
+  const sendMessage = async payload => {
+    if (!myUsername || !activeChatId) return;
 
     let text = "";
     let attachments = [];
@@ -168,15 +170,14 @@ export default function DMPage() {
     if (!text.trim() && !code && attachments.length === 0) return;
 
     const body = {
-      fromUserId: myUserId,
-      toUserId: activeChatId,
+      fromUserId: myUsername,  // username!
+      toUserId: activeChatId,  // friend username
       text: text.trim(),
       code,
-      // attachments: later when you handle upload
     };
 
     try {
-      const res = await fetch("http://localhost:5000/dm/messages", {
+      const res = await fetch(`${DM_API}/dm/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -192,7 +193,7 @@ export default function DMPage() {
       const ts = Date.parse(m.createdAt) || Date.now();
 
       const next = {
-        id: m.id,
+        id: m._id || m.id,
         ts,
         from: "ME",
         author: "You",
@@ -206,56 +207,60 @@ export default function DMPage() {
         mine: true,
       };
 
-      setMessages((prev) => [...prev, next]);
+      setMessages(prev => [...prev, next]);
     } catch (err) {
       console.error("Send error", err);
     }
   };
 
-    const onAddFriend = async () => {
+  // ----- add friend flow -----
+  const onAddFriend = async () => {
     const username = friendUsername.trim();
-    if (!username || !myUserId) return;
+    if (!username || !myUsername) return;
 
     setAddingFriend(true);
     try {
-      // 1) add friend on backend
-      const res = await fetch(`http://localhost:5000/users/${myUserId}/friends`, {
+      // 1) add friend on FastAPI backend
+      const res = await fetch(`${DM_API}/users/${encodeURIComponent(myUsername)}/friends`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
+        body: JSON.stringify({ friendUsername: username }), // <-- must match FastAPI model
       });
       const data = await res.json();
       if (!res.ok) {
         console.error("Add friend failed:", data);
-        alert(data?.msg || "Failed to add friend");
+        alert(data?.detail || data?.msg || "Failed to add friend");
         return;
       }
 
-      // 2) search to get friend userId + display data
+      // 2) search to get friend display data
       const searchRes = await fetch(
-        `http://localhost:5000/users/search?q=${encodeURIComponent(username)}`
+        `${DM_API}/users/search?q=${encodeURIComponent(username)}`
       );
       const searchData = await searchRes.json();
       const match = (searchData.results || []).find(
-        (u) => u.username.toLowerCase() === username.toLowerCase()
+        u => u.username.toLowerCase() === username.toLowerCase()
       );
       if (!match) {
         alert("Friend added but could not load profile info.");
         return;
       }
 
-      const friendId = match.userId;
+      const friendId = match.username; // <-- username is our id
 
       // 3) update chats list
-      setChats((prev) => {
-        if (prev.some((c) => c.id === friendId)) return prev;
+      setChats(prev => {
+        if (prev.some(c => c.id === friendId)) return prev;
         const now = new Date();
         const newChat = {
           id: friendId,
           initials: match.initials,
           name: match.displayName || match.username,
           last: "Start secure chat",
-          time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          time: now.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
           unread: 0,
         };
         return [newChat, ...prev];
@@ -274,14 +279,11 @@ export default function DMPage() {
     }
   };
 
-
-  // handy refs for header
   const activeChat =
-    chats.find((c) => c.id === activeChatId) || { name: "Chat", initials: "U" };
+    chats.find(c => c.id === activeChatId) || { name: "Chat", initials: "U" };
 
   return (
     <div className={`dm-layout ${panelOpen ? "is-panel-open" : ""}`}>
-
       {/* LEFT COLUMN: chats list */}
       <DmChatPanel
         open={panelOpen}
@@ -289,15 +291,12 @@ export default function DMPage() {
         setQuery={setPanelQuery}
         chats={chats}
         activeId={activeChatId}
-        onSelect={(id) => {
-          setActiveChatId(id); // messages will be loaded by useEffect
-        }}
-         onAddFriend={() => setAddFriendOpen(true)} 
+        onSelect={id => setActiveChatId(id)}
+        onAddFriend={() => setAddFriendOpen(true)}
       />
 
-     
+      {/* RIGHT COLUMN: header + messages + composer */}
       <div className="dm-page">
-
         <DmHeader
           name={activeChat.name}
           initials={activeChat.initials}
@@ -310,19 +309,20 @@ export default function DMPage() {
           vanishText={vanishText}
           onToggleVanish={onToggleVanish}
           e2eKey="A1C9-7F2E-B4D1-88AA"
-          onTogglePanel={() => setPanelOpen((v) => !v)}
+          onTogglePanel={() => setPanelOpen(v => !v)}
         />
 
         <div className="dm-body cw-card">
           <DmList messages={messages} />
+
           {messages.length === 0 && (
-  <div className="dm-empty">
-    <p>No messages yet.</p>
-    <p className="dm-empty-sub">
-      Use “+ Find / add friend” to start a secure chat.
-    </p>
-  </div>
-)}
+            <div className="dm-empty">
+              <p>No messages yet.</p>
+              <p className="dm-empty-sub">
+                Use “+ Find / add friend” to start a secure chat.
+              </p>
+            </div>
+          )}
 
           <DmComposer
             vanishOn={vanish.on}
@@ -332,7 +332,7 @@ export default function DMPage() {
         </div>
       </div>
 
-      {/* MODAL stays outside grid but inside dm-layout */}
+      {/* Add-friend modal */}
       {addFriendOpen && (
         <div className="dm-modal-backdrop">
           <div className="dm-modal">
@@ -344,7 +344,7 @@ export default function DMPage() {
               className="dm-input-text"
               placeholder="username (without @)"
               value={friendUsername}
-              onChange={(e) => setFriendUsername(e.target.value)}
+              onChange={e => setFriendUsername(e.target.value)}
             />
             <div className="dm-modal-actions">
               <button

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
+from bson import ObjectId
 import motor.motor_asyncio
 from typing import List, Optional
 import re
@@ -123,14 +124,32 @@ async def get_conversations(userId: str):
 
 @app.get("/dm/messages")
 async def get_messages(user1: str, user2: str):
-    msgs = await db.messages.find({
+    raw_msgs = await db.messages.find({
         "$or": [
             {"fromUserId": user1, "toUserId": user2},
             {"fromUserId": user2, "toUserId": user1}
         ]
     }).sort("createdAt", 1).to_list(length=200)
 
-    return {"messages": msgs}
+    messages = []
+    for m in raw_msgs:
+        created = m.get("createdAt")
+        if isinstance(created, datetime):
+            created_str = created.isoformat() + "Z"
+        else:
+            created_str = str(created)
+        
+        messages.append({
+            "id": str(m.get("_id")),
+            "fromUserId": m.get("fromUserId", ""),
+            "toUserId": m.get("toUserId", ""),
+            "text": m.get("text", ""),
+            "code": m.get("code"),
+            "attachments": m.get("attachments", []),
+            "createdAt": created_str,
+        })
+    
+    return {"messages": messages}
 
 
 @app.post("/dm/messages")
@@ -195,5 +214,5 @@ async def add_friend(username: str, req: FriendRequest):
     return {
         "msg": "friend added",
         "me": username,
-        "friend": friend["username"],
+        "friend": friend
     }
