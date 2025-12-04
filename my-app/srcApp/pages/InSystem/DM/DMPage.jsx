@@ -74,7 +74,7 @@ export default function DMPage() {
     );
   };
 
-  // ----- load conversations -----
+  // ----- load conversations (and refresh occasionally) -----
   useEffect(() => {
     if (!myUsername) return;
 
@@ -105,14 +105,20 @@ export default function DMPage() {
       }
     };
 
+    // initial load
     loadConversations();
+    // optional: refresh every 10s to catch new convs
+    const interval = setInterval(loadConversations, 10000);
+    return () => clearInterval(interval);
   }, [myUsername, activeChatId]);
 
-  // ----- load messages for active chat -----
+  // ----- poll messages for active chat every 2s -----
   useEffect(() => {
     if (!myUsername || !activeChatId) return;
 
-    const loadMessages = async () => {
+    let cancelled = false;
+
+    const fetchMessages = async () => {
       try {
         const res = await fetch(
           `${DM_API}/dm/messages?user1=${encodeURIComponent(
@@ -120,6 +126,11 @@ export default function DMPage() {
           )}&user2=${encodeURIComponent(activeChatId)}`
         );
         const data = await res.json();
+        if (!res.ok) {
+          console.error("Failed to load messages", data);
+          return;
+        }
+
         const other = chats.find(c => c.id === activeChatId);
 
         const uiMessages = (data.messages || []).map(m => {
@@ -142,16 +153,26 @@ export default function DMPage() {
           };
         });
 
-        setMessages(uiMessages);
+        if (!cancelled) {
+          setMessages(uiMessages);
+        }
       } catch (err) {
         console.error("Failed to load messages", err);
       }
     };
 
-    loadMessages();
-  }, [myUsername, activeChatId]); // <- no "chats" here so it doesn't fight with send
+    // initial fetch
+    fetchMessages();
+    // poll every 2 seconds
+    const interval = setInterval(fetchMessages, 2000);
 
-  // ----- send message (optimistic) -----
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [myUsername, activeChatId, chats]);
+
+  // ----- send message -----
   const sendMessage = async payload => {
     if (!myUsername || !activeChatId) return;
 
@@ -168,25 +189,6 @@ export default function DMPage() {
     }
 
     if (!text.trim() && !code && attachments.length === 0) return;
-
-    // optimistic local msg
-    const ts = Date.now();
-    const optimistic = {
-      id: `local-${ts}`,
-      ts,
-      from: "ME",
-      author: "You",
-      time: new Date(ts).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      text: text.trim(),
-      attachments,
-      code,
-      mine: true,
-    };
-
-    setMessages(prev => [...prev, optimistic]);
 
     const body = {
       fromUserId: myUsername,
@@ -208,28 +210,8 @@ export default function DMPage() {
         return;
       }
 
-      const m = data.message;
-      const serverTs = Date.parse(m.createdAt) || Date.now();
-
-      const serverMsg = {
-        id: m._id || m.id,
-        ts: serverTs,
-        from: "ME",
-        author: "You",
-        time: new Date(serverTs).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        text: m.text,
-        attachments,
-        code: m.code || null,
-        mine: true,
-      };
-
-      setMessages(prev => [
-        ...prev.filter(msg => !String(msg.id).startsWith("local-")),
-        serverMsg,
-      ]);
+      // we don't need manual setMessages – poll will pick it up
+      // but if you want instant visual echo, you can still add optimistic msg
     } catch (err) {
       console.error("Send error", err);
     }
@@ -292,7 +274,7 @@ export default function DMPage() {
       setAddFriendOpen(false);
       setFriendUsername("");
     } catch (err) {
-      console.error("Add friend error:", err);
+      console.error("Add friend error", err);
       alert("Failed to add friend");
     } finally {
       setAddingFriend(false);
