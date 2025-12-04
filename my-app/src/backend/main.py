@@ -3,14 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
-from bson import ObjectId
 import motor.motor_asyncio
-from typing import List, Optional
 import re
 
 # --- MongoDB setup ---
+# IMPORTANT: same DB as Flask (Utilisateur)
 DATABASE_URI = "mongodb://100.123.33.82:27017"
-DB_NAME = "Chatdb"
+DB_NAME = "Utilisateur"  # <-- match app.py
 
 client = motor.motor_asyncio.AsyncIOMotorClient(DATABASE_URI)
 db = client[DB_NAME]
@@ -20,7 +19,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # adjust for production
+    allow_origins=["*"],   # adjust for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,8 +33,8 @@ class User(BaseModel):
     friends: List[str] = []
 
 class Message(BaseModel):
-    fromUserId: str
-    toUserId: str
+    fromUserId: str   # we use username, not ObjectId
+    toUserId: str     # username of friend
     text: str
     code: Optional[str] = None
     createdAt: Optional[datetime] = None
@@ -43,7 +42,8 @@ class Message(BaseModel):
 class FriendRequest(BaseModel):
     friendUsername: str
 
-# --- Create default users on startup ---
+
+# --- Create default users on startup (optional) ---
 @app.on_event("startup")
 async def create_default_users():
     default_users = [
@@ -67,10 +67,15 @@ async def create_default_users():
         else:
             print(f"Default user already exists: {user['username']}")
 
+
 # --- Routes ---
 
 @app.post("/register")
 async def register_user(user: User):
+    """
+    Only for DM testing; your main registration is in Flask.
+    This one stores minimal user profile in the same Mongo DB.
+    """
     existing = await db.users.find_one({"username": user.username})
     if existing:
         raise HTTPException(status_code=400, detail="User already exists")
@@ -111,10 +116,18 @@ async def get_conversations(userId: str):
     for r in results:
         other_id = r["_id"]["otherUserId"]
         other_user = await db.users.find_one({"username": other_id})
+
+        if other_user:
+            display = other_user.get("displayName") or other_user.get("username") or other_id
+            initials = other_user.get("initials") or (display[:2] or "U").upper()
+        else:
+            display = other_id
+            initials = (other_id[:2] or "U").upper()
+
         conversations.append({
             "otherUserId": other_id,
-            "displayName": other_user["displayName"] if other_user else other_id,
-            "initials": other_user["initials"] if other_user else "?",
+            "displayName": display,
+            "initials": initials,
             "lastText": r["lastText"],
             "lastAt": r["lastAt"],
         })
@@ -122,53 +135,64 @@ async def get_conversations(userId: str):
     return {"conversations": conversations}
 
 
+
 @app.get("/dm/messages")
 async def get_messages(user1: str, user2: str):
-    raw_msgs = await db.messages.find({
+    """
+    user1 & user2 are usernames (not ObjectIds)
+    """
+    msgs_cursor = db.messages.find({
         "$or": [
             {"fromUserId": user1, "toUserId": user2},
-            {"fromUserId": user2, "toUserId": user1}
+            {"fromUserId": user2, "toUserId": user1},
         ]
-    }).sort("createdAt", 1).to_list(length=200)
+    }).sort("createdAt", 1)
 
     messages = []
-    for m in raw_msgs:
-        created = m.get("createdAt")
+    async for m in msgs_cursor:
+        created = m.get("createdAt") or datetime.utcnow()
         if isinstance(created, datetime):
             created_str = created.isoformat() + "Z"
         else:
             created_str = str(created)
-        
+
         messages.append({
             "id": str(m.get("_id")),
-            "fromUserId": m.get("fromUserId", ""),
-            "toUserId": m.get("toUserId", ""),
+            "fromUserId": m.get("fromUserId"),
+            "toUserId": m.get("toUserId"),
             "text": m.get("text", ""),
             "code": m.get("code"),
             "attachments": m.get("attachments", []),
             "createdAt": created_str,
         })
-    
+
     return {"messages": messages}
 
 
 @app.post("/dm/messages")
 async def send_message(msg: Message):
+    """
+    msg.fromUserId & msg.toUserId are usernames.
+    """
     msg.createdAt = datetime.utcnow()
     doc = msg.dict()
     result = await db.messages.insert_one(doc)
     doc["_id"] = str(result.inserted_id)
+    # make createdAt JSON-safe
+    doc["createdAt"] = msg.createdAt.isoformat() + "Z"
     return {"message": doc}
+
 
 @app.get("/users/search")
 async def search_users(q: str = ""):
     """
-    Search users ny username prefix: /users/search?q=roo
+    Search users by username prefix: /users/search?q=roo
+    Case-insensitive.
     """
     q = q.strip()
     if not q:
         return {"results": []}
-    
+
     regex = re.compile(f"^{re.escape(q)}", re.IGNORECASE)
     cursor = db.users.find({"username": {"$regex": regex}})
 
@@ -184,35 +208,53 @@ async def search_users(q: str = ""):
         })
     return {"results": results}
 
+
 @app.post("/users/{username}/friends")
 async def add_friend(username: str, req: FriendRequest):
     """
     Add a friend by username.
-    Body: { "friendUserame": "roottest" }
+    Path:  /users/{username}/friends        (username = current user)
+    Body:  { "friendUsername": "roottest" }
+    Now case-insensitive + trimmed.
     """
-    me = await db.users.find_one({"username": username})
+    me_name = username.strip()
+    friend_name = (req.friendUsername or "").strip()
+
+    if not me_name or not friend_name:
+        raise HTTPException(status_code=400, detail="Usernames cannot be empty")
+
+    # Case-insensitive lookup for "me"
+    me = await db.users.find_one(
+        {"username": {"$regex": f"^{re.escape(me_name)}$", "$options": "i"}}
+    )
     if not me:
         raise HTTPException(status_code=404, detail="User not found")
 
-    friend = await db.users.find_one({"username": req.friendUsername})
+    # Case-insensitive lookup for "friend"
+    friend = await db.users.find_one(
+        {"username": {"$regex": f"^{re.escape(friend_name)}$", "$options": "i"}}
+    )
     if not friend:
         raise HTTPException(status_code=404, detail="Friend not found")
 
-    if friend["username"] == username:
+    me_username = me["username"]
+    friend_username = friend["username"]
+
+    if friend_username == me_username:
         raise HTTPException(status_code=400, detail="Cannot add yourself")
 
+    # Add each other to friends list (store by username)
     await db.users.update_one(
-        {"username": username},
-        {"$addToSet": {"friends": friend["username"]}}
+        {"username": me_username},
+        {"$addToSet": {"friends": friend_username}},
     )
-
     await db.users.update_one(
-        {"username": friend["username"]},
-        {"$addToSet": {"friends": username}}
+        {"username": friend_username},
+        {"$addToSet": {"friends": me_username}},
     )
 
     return {
         "msg": "friend added",
-        "me": username,
-        "friend": friend
+        "me": me_username,
+        "friend": friend_username,
     }
