@@ -166,7 +166,7 @@ export default function DMPage() {
     // initial fetch
     fetchMessages();
     // poll every 2 seconds
-    const interval = setInterval(fetchMessages, 2000);
+    const interval = setInterval(fetchMessages, 100);
 
     return () => {
       cancelled = true;
